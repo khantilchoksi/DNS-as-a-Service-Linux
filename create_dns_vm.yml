@@ -1,0 +1,128 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    vm_disk_location: /var/lib/libvirt/images
+    dns_image_location: /home/ece792/images/dns.img
+    root_pass: root
+  dns_vms:
+    dns_t2vpc1:
+      dns_vm_name: dns_t2vpc1
+      bridge_name: t1_dns_sw
+      network_name: t1_dns_net
+      bridge_type: bridge
+      gateway_address: 25.0.0.1/24
+      vpc_name: t2vpc1
+      controller_network: controller_net
+
+  tasks:
+    - debug:
+         msg: "{{dns_vms}}"
+  
+    # Install required packages
+#    - name: Install required packages for libvirt, lxml
+#      apt: 
+#        name: "{{packages}}"
+#      become: yes
+
+    # Create an Linux type bridge
+    - name: Create Linux Bridge
+      command: "brctl addbr {{dns_vms[item].bridge_name}}"
+      with_items: "{{ dns_vms | list }}"
+      ignore_errors: true
+      become: yes
+    
+    # Define a new network
+    - name: Define Virtual Network
+      virt_net:
+        command: define
+        name: "{{dns_vms[item].network_name}}"
+        xml: "{{ lookup('template', 'templates/dns_bridge_template.xml.j2' ) }}"
+      with_items: "{{ dns_vms | list }}"
+      ignore_errors: true
+
+    # Create and start a network
+    - name: Create Virtual Network if not created
+      virt_net:
+        command: create
+        name: "{{ dns_vms[item].network_name }}"
+      with_items: "{{ dns_vms | list }}"
+      ignore_errors: true
+      become: yes
+  
+    # Set interface bridge up
+    - name: Set Interface of bridges up
+      command: "sudo ifconfig {{dns_vms[item].bridge_name}} up"
+      with_items: "{{ dns_vms | list }}"
+      ignore_errors: true
+      become: yes
+
+    # Create veth pair
+    - name: Set Interface of bridges up
+      command: "ip link add {{dns_vms[item].bridge_name}}vif1 type veth peer name {{dns_vms[item].bridge_name}}vif2"
+      with_items: "{{ dns_vms | list }}"
+      ignore_errors: true
+      become: yes
+
+
+    # Add vethpair interface to namespace
+    - name: Add vethpair interface to namespace
+      command: "sudo ip link set {{dns_vms[item].bridge_name}}vif1 netns {{dns_vms[item].vpc_name}}_ns"
+      with_items: "{{ dns_vms | list }}"
+      ignore_errors: true
+      become: yes
+
+    # Attach another veth pair interface with bridge
+    - name: Attach another vethpair interface to bridge
+      command: "sudo brctl addif {{dns_vms[item].bridge_name}} {{dns_vms[item].bridge_name}}vif2"
+      with_items: "{{ dns_vms | list }}"
+      ignore_errors: true
+      become: yes
+
+    # Assign ip to vethpair interface inside namespace
+    - name: Add vethpair interface to namespace
+      command: "sudo ip netns exec {{dns_vms[item].vpc_name}} ifconfig {{dns_vms[item].bridge_name}}vif1 {{dns_vms[item].gateway_address}} up"
+      with_items: "{{ dns_vms | list }}"
+      ignore_errors: true
+      become: yes
+    
+    # Get List of VM Disks
+    - name: Get list of VM disks
+      command: "ls {{ vm_disk_location }}"
+      register: disks
+      changed_when: "disks.rc != 0"
+      become: yes
+  
+    #Copy VM Disk Image for DNS
+    - name: Copy VM Disk Image for DNS
+      copy:
+        src: "{{dns_image_location}}"
+        dest: "{{vm_disk_location}}/{{dns_vms[item].dns_vm_name}}.img"
+      when: "{{dns_vms[item].dns_vm_name}} not in {{disks.stdout}}"
+      with_items: "{{ dns_vms | list }}"
+      become: yes
+
+    # List of VMs
+    - name: Get list of VMs
+      virt:
+        command: "list_vms"
+      register: vms
+
+    #Define new vm
+    - name: Define new vm
+      virt:
+        name: "{{dns_vms[item].dns_vm_name}}"
+        command: define
+        xml: "{{ lookup('template', 'templates/dns_vm_template.xml.j2') }}"
+      when: "{{dns_vms[item].dns_vm_name}} not in {{vms.list_vms}}"
+      with_items: "{{ dns_vms | list }}"
+      become: yes
+
+    # Create and start new vm
+    - name: Start vm
+      virt:
+        name: "{{dns_vms[item].dns_vm_name}}"
+        command: create
+      with_items: "{{ dns_vms | list }}"
+      become: yes
+    
