@@ -12,6 +12,7 @@
         network_name: t1_dns_net
         bridge_type: bridge
         gateway_address: 25.0.0.1/24
+        subnet_range: 25.0.0.2,25.0.0.250,12h
         vpc_name: t2vpc1
         controller_network: controller_net
 
@@ -64,25 +65,38 @@
       ignore_errors: true
       become: yes
 
-
     # Add vethpair interface to namespace
     - name: Add vethpair interface to namespace
-      command: "sudo ip link set {{dns_vms[item].bridge_name}}vif1 netns {{dns_vms[item].vpc_name}}_ns"
+      command: "ip link set {{dns_vms[item].bridge_name}}vif1 netns {{dns_vms[item].vpc_name}}_ns"
       with_items: "{{ dns_vms | list }}"
       ignore_errors: true
       become: yes
 
     # Attach another veth pair interface with bridge
     - name: Attach another vethpair interface to bridge
-      command: "sudo brctl addif {{dns_vms[item].bridge_name}} {{dns_vms[item].bridge_name}}vif2"
+      command: "brctl addif {{dns_vms[item].bridge_name}} {{dns_vms[item].bridge_name}}vif2"
       with_items: "{{ dns_vms | list }}"
       ignore_errors: true
       become: yes
 
     # Assign ip to vethpair interface inside namespace
-    - name: Add vethpair interface to namespace
-      command: "sudo ip netns exec {{dns_vms[item].vpc_name}} ifconfig {{dns_vms[item].bridge_name}}vif1 {{dns_vms[item].gateway_address}} up"
+    - name: Assign ip to vethpair interface inside namespace
+      command: "ip netns exec {{dns_vms[item].vpc_name}}_ns ifconfig {{dns_vms[item].bridge_name}}vif1 {{dns_vms[item].gateway_address}} up"
       with_items: "{{ dns_vms | list }}"
+      ignore_errors: true
+      become: yes
+
+    # Add ip table rules NAT inside the vpc namespace for subnet
+    - name: Add ip table rules NAT inside the vpc namespace for subnet
+      command: "ip netns exec {{dns_vms[item].vpc_name}}_ns iptables -t nat -I POSTROUTING 1 -s {{dns_vms[item].subnet_range}} ! -d {{dns_vms[item].subnet_range}} -j MASQUERADE"
+      with_items: "{{ dns_vms | list }}"
+      ignore_errors: true
+      become: yes
+
+   # Provide  DHCP and DNS 
+    - name: Make the interface of subnet to run dhcp server
+      command: "ip netns exec {{subnets[item].vpc_name}}_ns dnsmasq --interface={{subnets[item].subnet_name}}vif1 --except-interface=lo --bind-interfaces --dhcp-range={{subnets[item].dhcp_range}}"
+      with_items: "{{ subnets | list }}"
       ignore_errors: true
       become: yes
     
