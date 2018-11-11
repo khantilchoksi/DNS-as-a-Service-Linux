@@ -63,6 +63,7 @@
     - name: Add vethpair interface to namespace
       command: "ip link set {{subnets[item].subnet_name}}vif1 netns {{subnets[item].vpc_name}}_ns"
       with_items: "{{ subnets | list }}"
+      ignore_errors: true
       become: yes
 
     # Attach another veth pair interface with bridge
@@ -74,20 +75,21 @@
 
     # Assign ip to vethpair interface inside vpc namespace
     - name: Add vethpair interface to namespace
-      command: "sudo ip netns exec {{subnets[item].vpc_name}}_ns ifconfig {{subnets[item].subnet_name}}vif1 {{subnets[item].vpc_gateway}} up"
+      command: "ip netns exec {{subnets[item].vpc_name}}_ns ifconfig {{subnets[item].subnet_name}}vif1 {{subnets[item].vpc_gateway}} up"
       with_items: "{{ subnets | list }}"
+      ignore_errors: true
       become: yes
 
     # Add ip table rules NAT inside the vpc namespace for subnet
     - name: Add ip table rules NAT inside the vpc namespace for subnet
-      command: "sudo ip netns exec {{subnets[item].vpc_name}}_ns iptables -t nat -I POSTROUTING 1 -s {{subnets[item].subnet_range}} ! -d {{subnets[item].subnet_range}} -j MASQUERADE"
+      command: "ip netns exec {{subnets[item].vpc_name}}_ns iptables -t nat -I POSTROUTING 1 -s {{subnets[item].subnet_range}} ! -d {{subnets[item].subnet_range}} -j MASQUERADE"
       with_items: "{{ subnets | list }}"
+      ignore_errors: true
       become: yes
 
    # Provide  DHCP and DNS 
     - name: Make the interface of subnet to run dhcp server
-      command: "dnsmasq --interface={{subnets[item].subnet_name}}vif1 --except-interface=lo --bind-interfaces --dhcp-range={{subnets[item].dhcp_range}}"
+      command: "ip netns exec {{subnets[item].vpc_name}}_ns dnsmasq --interface={{subnets[item].subnet_name}}vif1 --except-interface=lo --bind-interfaces --dhcp-range={{subnets[item].dhcp_range}}"
       with_items: "{{ subnets | list }}"
-      when: networks[item].bridge_type == 'nat/dhcp'
       ignore_errors: true
       become: yes
