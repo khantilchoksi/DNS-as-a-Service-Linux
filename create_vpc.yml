@@ -6,18 +6,20 @@
     root_pass: root
     provider_namespace: provider_ns
     vpcs:
-      vpc_name: t2vpc1
-      vpc_gateway: 62.0.0.2/24
-      provider_gateway: 62.0.0.1/24
+      t2vpc1:
+        vpc_name: t2vpc1
+        vpc_gateway: 62.0.0.2/24
+        provider_gateway: 62.0.0.1/24
+        provider_gateway_ip: 62.0.0.1
 
   tasks:
     - debug:
          msg: "{{vpcs}}"
     
-    # Creating Network Namespace
     - name: creating network namespace
-      command: "ip netns add {{vpcs[item].vpc_name}}"
+      command: "ip netns add {{vpcs[item].vpc_name}}_ns"
       with_items: "{{ vpcs | list }}"
+      ignore_errors: true
       become: yes
 
     # Module namespace not working
@@ -30,37 +32,43 @@
     #   become: yes
     
     # Create veth pair
-    - name: Set Interface of bridges up
+    - name: Create veth pair
       command: "ip link add {{vpcs[item].vpc_name}}vif1 type veth peer name {{vpcs[item].vpc_name}}vif2"
       with_items: "{{ vpcs | list }}"
+      ignore_errors: true
       become: yes
 
     # Add vethpair interface to namespace
     - name: Add vethpair interface to namespace
       command: "sudo ip link set {{vpcs[item].vpc_name}}vif1 netns {{vpcs[item].vpc_name}}_ns"
       with_items: "{{ vpcs | list }}"
+      ignore_errors: true
       become: yes
 
     # Attach another veth pair interface to provider_ns bridge
     - name: Add vethpair interface to provider_namespace
       command: "sudo ip link set {{vpcs[item].vpc_name}}vif2 netns {{provider_namespace}}"
       with_items: "{{ vpcs | list }}"
+      ignore_errors: true
       become: yes
 
     # Assign ip to vethpair interface inside vpc namespace
     - name: Add vethpair interface to namespace
       command: "sudo ip netns exec {{vpcs[item].vpc_name}}_ns ifconfig {{vpcs[item].vpc_name}}vif1 {{vpcs[item].vpc_gateway}} up"
       with_items: "{{ vpcs | list }}"
+      ignore_errors: true
       become: yes
 
     # Assign ip to vethpair interface inside provider namespace
     - name: Add vethpair interface to namespace
       command: "sudo ip netns exec {{provider_namespace}} ifconfig {{vpcs[item].vpc_name}}vif2 {{vpcs[item].provider_gateway}} up"
       with_items: "{{ vpcs | list }}"
+      ignore_errors: true
       become: yes
 
     # Add default route to be of provider_ns
     - name: Add default route to be of provider_ns
-      command: "sudo ip netns exec {{vpcs[item].vpc_name}}_ns ip route add 0.0.0.0/0 via {{vpcs[item].provider_gateway}} dev {{vpcs[item].vpc_name}}vif1"
+      command: "sudo ip netns exec {{vpcs[item].vpc_name}}_ns ip route add 0.0.0.0/0 via {{vpcs[item].provider_gateway_ip}} dev {{vpcs[item].vpc_name}}vif1"
       with_items: "{{ vpcs | list }}"
+      ignore_errors: true
       become: yes
