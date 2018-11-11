@@ -11,6 +11,7 @@
         vpc_name: t2vpc1
         subnet_range: 22.0.0.0/24
         vpc_gateway: 22.0.0.1/24
+        dhcp_range: 22.0.0.2,22.0.0.250,12h 
 
   vars_files:
 
@@ -81,4 +82,12 @@
     - name: Add ip table rules NAT inside the vpc namespace for subnet
       command: "sudo ip netns exec {{subnets[item].vpc_name}}_ns iptables -t nat -I POSTROUTING 1 -s {{subnets[item].subnet_range}} ! -d {{subnets[item].subnet_range}} -j MASQUERADE"
       with_items: "{{ subnets | list }}"
+      become: yes
+
+   # Provide  DHCP and DNS 
+    - name: Make the interface of subnet to run dhcp server
+      command: "dnsmasq --interface={{subnets[item].subnet_name}}vif1 --except-interface=lo --bind-interfaces --dhcp-range={{subnets[item].dhcp_range}}"
+      with_items: "{{ subnets | list }}"
+      when: networks[item].bridge_type == 'nat/dhcp'
+      ignore_errors: true
       become: yes
