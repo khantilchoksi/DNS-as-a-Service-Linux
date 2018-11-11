@@ -1,0 +1,81 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    vm_disk_location: /var/lib/libvirt/images
+    root_pass: root
+    provider_namespace: provider_ns
+    subnets:
+      subnet_name: t2sub1
+      vpc_name: t2vpc1
+      subnet_range: 22.0.0.0/24
+      vpc_gateway: 22.0.0.1/24
+
+  vars_files:
+
+
+  tasks:
+    - debug:
+         msg: "{{subnets}}"
+    
+    # Create an Linux type bridge
+    - name: Create Linux Bridge
+      command: "brctl addbr {{subnets[item].subnet_name}}"
+      with_items: "{{ subnets | list }}"
+      become: yes
+    
+    # Define a new network
+    - name: Define Virtual Network
+      virt_net:
+        command: define
+        name: "{{subnets[item].subnet_name}}"
+        xml: "{{ lookup('template', 'templates/subnet_bridge_template.xml.j2' ) }}"
+      with_items: "{{ subnets | list }}"
+      ignore_errors: true
+
+    # Create and start a network
+    - name: Create Virtual Network if not created
+      virt_net:
+        command: create
+        name: "{{ subnets[item].subnet_name }}"
+      with_items: "{{ subnets | list }}"
+      ignore_errors: true
+      become: yes
+  
+    # Set interface bridge up
+    - name: Set Interface of bridges up
+      command: "sudo ifconfig {{subnets[item].subnet_name}} up"
+      with_items: "{{ subnets | list }}"
+      ignore_errors: true
+      become: yes
+
+    # Create veth pair
+    - name: Set Interface of bridges up
+      command: "ip link add {{subnets[item].subnet_name}}vif1 type veth peer name {{subnets[item].subnet_name}}vif2"
+      with_items: "{{ subnets | list }}"
+      become: yes
+
+    # Add vethpair interface to namespace
+    - name: Add vethpair interface to namespace
+      command: "ip link set {{subnets[item].subnet_name}}vif1 netns {{vpcs[item].vpc_name}}_ns"
+      with_items: "{{ subnets | list }}"
+      become: yes
+
+    # Attach another veth pair interface with bridge
+    - name: Attach another vethpair interface to bridge
+      command: "brctl addif {{subnets[item].subnet_name}} {{subnets[item].subnet_name}}vif2"
+      with_items: "{{ subnets | list }}"
+      ignore_errors: true
+      become: yes
+
+    # Assign ip to vethpair interface inside vpc namespace
+    - name: Add vethpair interface to namespace
+      command: "sudo ip netns exec {{subnets[item].vpc_name}}_ns ifconfig {{subnets[item].subnet_name}}vif1 {{subnets[item].vpc_gateway}} up"
+      with_items: "{{ subnets | list }}"
+      become: yes
+
+    # Add ip table rules NAT inside the vpc namespace for subnet
+    - name: Add ip table rules NAT inside the vpc namespace for subnet
+      command: "sudo ip netns exec {{subnets[item].vpc_name}}_ns iptables -t nat -I POSTROUTING 1 -s {{subnets[item].subnet_range}} ! -d {{subnets[item].subnet_range}} -j MASQUERADE"
+      with_items: "{{ subnets | list }}"
+      become: yes

@@ -5,7 +5,7 @@
     vm_disk_location: /var/lib/libvirt/images
     dns_image_location: /home/ece792/images/dns.img
     root_pass: root
-    dns_vms:
+    vms:
       dns_t2vpc1:
         dns_vm_name: dns_t2vpc1
         bridge_name: t1_dns_sw
