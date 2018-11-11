@@ -6,10 +6,11 @@
     root_pass: root
     provider_namespace: provider_ns
     subnets:
-      subnet_name: t2sub1
-      vpc_name: t2vpc1
-      subnet_range: 22.0.0.0/24
-      vpc_gateway: 22.0.0.1/24
+      t2sub1:
+        subnet_name: t2sub1
+        vpc_name: t2vpc1
+        subnet_range: 22.0.0.0/24
+        vpc_gateway: 22.0.0.1/24
 
   vars_files:
 
@@ -22,6 +23,7 @@
     - name: Create Linux Bridge
       command: "brctl addbr {{subnets[item].subnet_name}}"
       with_items: "{{ subnets | list }}"
+      ignore_errors: true
       become: yes
     
     # Define a new network
@@ -50,14 +52,15 @@
       become: yes
 
     # Create veth pair
-    - name: Set Interface of bridges up
+    - name: Create veth pairs
       command: "ip link add {{subnets[item].subnet_name}}vif1 type veth peer name {{subnets[item].subnet_name}}vif2"
       with_items: "{{ subnets | list }}"
+      ignore_errors: true
       become: yes
 
     # Add vethpair interface to namespace
     - name: Add vethpair interface to namespace
-      command: "ip link set {{subnets[item].subnet_name}}vif1 netns {{vpcs[item].vpc_name}}_ns"
+      command: "ip link set {{subnets[item].subnet_name}}vif1 netns {{subnets[item].vpc_name}}_ns"
       with_items: "{{ subnets | list }}"
       become: yes
 
