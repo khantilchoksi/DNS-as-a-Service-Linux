@@ -1,0 +1,52 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    vars_files: vpc_vars.yml
+  tasks:
+    # Create tenant directory if not available
+    - name: Create tenant directory if not available
+      file:
+        path: "~/tenants/{{vpcs[item]}}"
+        state: directory
+        mode: 0666
+        recurse: yes
+      with_items: "{{ vpcs | list }}"
+      become: yes
+        
+    # Create database file if doesn't exist
+    - name: ensure file exists
+      copy:
+        content: ""
+        dest: "~/tenants/{{vpcs[item]}}/vpc_db"
+        force: no
+        mode: 0666
+      with_items: "{{ vpcs | list }}"
+      become: yes
+
+    # Load database from file
+    - name: Load database from file
+      slurp:
+        src: "~/tenants/{{vpc[item]}}/vpc_db.json"
+      register: vpc_db
+      with_items: "{{ vpcs | list }}"
+      become: yes
+
+    # Debug existing database
+    - name: Debug existing database
+      debug:
+        msg: "{{ vpc_db.results.content|b64decode|from_json }}"
+
+    - name: Append new vpc to database file
+      set_fact:
+        vpc_db: "{{ vpc_db.results.content| b64decode| from_json | default([]) | combine('{{vpcs[item] | to_json}}') }}"
+
+    # Debug new database
+    - name: Debug new database
+      debug:
+        var: vpc_db
+
+    - name: Write db back to file
+      copy: 
+        content: "{{ vpc_db | to_nice_json }}" 
+        dest: "~/tenants/{{vpc[item]}}/vpc_db.json"
