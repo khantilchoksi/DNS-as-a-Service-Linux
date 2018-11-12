@@ -8,11 +8,12 @@
     dns_vms:
       dns_t2vpc1:
         dns_vm_name: dns_t2vpc1
-        bridge_name: t1_dns_sw
-        network_name: t1_dns_net
+        bridge_name: t2_dns_sw
+        network_name: t2_dns_net
         bridge_type: bridge
         gateway_address: 25.0.0.1/24
-        subnet_range: 25.0.0.2,25.0.0.250,12h
+        subnet_ip: 25.0.0.0/24
+        dhcp_range: 25.0.0.2,25.0.0.250,12h
         vpc_name: t2vpc1
         controller_network: controller_net
 
@@ -88,15 +89,15 @@
 
     # Add ip table rules NAT inside the vpc namespace for subnet
     - name: Add ip table rules NAT inside the vpc namespace for subnet
-      command: "ip netns exec {{dns_vms[item].vpc_name}}_ns iptables -t nat -I POSTROUTING 1 -s {{dns_vms[item].subnet_range}} ! -d {{dns_vms[item].subnet_range}} -j MASQUERADE"
+      command: "ip netns exec {{dns_vms[item].vpc_name}}_ns iptables -t nat -I POSTROUTING 1 -s {{dns_vms[item].subnet_ip}} ! -d {{dns_vms[item].subnet_ip}} -j MASQUERADE"
       with_items: "{{ dns_vms | list }}"
       ignore_errors: true
       become: yes
 
    # Provide  DHCP and DNS 
     - name: Make the interface of subnet to run dhcp server
-      command: "ip netns exec {{subnets[item].vpc_name}}_ns dnsmasq --interface={{subnets[item].subnet_name}}vif1 --except-interface=lo --bind-interfaces --dhcp-range={{subnets[item].dhcp_range}}"
-      with_items: "{{ subnets | list }}"
+      command: "ip netns exec {{dns_vms[item].vpc_name}}_ns dnsmasq --interface={{dns_vms[item].bridge_name}}vif1 --except-interface=lo --bind-interfaces --dhcp-range={{dns_vms[item].dhcp_range}}"
+      with_items: "{{ dns_vms | list }}"
       ignore_errors: true
       become: yes
     
@@ -112,7 +113,7 @@
       copy:
         src: "{{dns_image_location}}"
         dest: "{{vm_disk_location}}/{{dns_vms[item].dns_vm_name}}.img"
-      when: "{{dns_vms[item].dns_vm_name}} not in {{disks.stdout}}"
+      when: dns_vms[item].dns_vm_name not in disks.stdout
       with_items: "{{ dns_vms | list }}"
       become: yes
 
@@ -122,15 +123,21 @@
         command: "list_vms"
       register: vms
 
+    - debug:
+         msg: "{{vms}}"
+    - debug:
+         msg: "{{dns_vms[item].dns_vm_name}}"
+      with_items: "{{ dns_vms | list }}"
+
     #Define new vm
     - name: Define new vm
       virt:
         name: "{{dns_vms[item].dns_vm_name}}"
         command: define
         xml: "{{ lookup('template', 'templates/dns_vm_template.xml.j2') }}"
-      when: "{{dns_vms[item].dns_vm_name}} not in {{vms.list_vms}}"
       with_items: "{{ dns_vms | list }}"
       become: yes
+
 
     # Create and start new vm
     - name: Start vm
