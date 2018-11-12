@@ -3,7 +3,7 @@
   gather_facts: no
   vars:
     vm_disk_location: /var/lib/libvirt/images
-    image_location: /home/ece792/images/centos7_minimal.img
+    centos_image_location: /home/ece792/images/dns.img
     root_pass: root
     vms:
       t2vm1:
@@ -29,7 +29,7 @@
     #Copy VM Disk Image for CentOS
     - name: Copy VM Disk Image for CentOS 7 Minimal
       copy:
-        src: "{{dns_image_location}}"
+        src: "{{centos_image_location}}"
         dest: "{{vm_disk_location}}/{{vms[item].vm_name}}.img"
       when: vms[item].vm_name not in disks.stdout
       with_items: "{{ vms | list }}"
@@ -39,23 +39,23 @@
     - name: Get list of VMs
       virt:
         command: "list_vms"
-      register: vms
+      register: existing_vms
 
     #Define new vm
     - name: Define new vm
       virt:
-        name: "{{dns_vms[item].dns_vm_name}}"
+        name: "{{vms[item].vm_name}}"
         command: define
         xml: "{{ lookup('template', 'templates/vm_template.xml.j2') }}"
-      when: vms[item].dns_vm_name not in vms.list_vms
+      when: vms[item].vm_name not in existing_vms.list_vms
       with_items: "{{ vms | list }}"
       become: yes
 
     # Create and start new vm
     - name: Start vm
       virt:
-        name: "{{dns_vms[item].dns_vm_name}}"
+        name: "{{vms[item].vm_name}}"
         command: create
-      with_items: "{{ dns_vms | list }}"
+      with_items: "{{ vms | list }}"
       become: yes
     
