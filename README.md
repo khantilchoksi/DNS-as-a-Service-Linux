@@ -22,8 +22,11 @@ Functional Documentation of Infrastructure automation:
 #### VM Instance CRUD:
 - Create:   
 - Tenant / User will require to fill up a form or json file which has creation parameters like: vcpu, memory, disk size, OS type, VPC id and as result we will create VM for the user, assign IP, (and do we have to provide private key to user ?)  
-    - `Command: ` `sudo ansible-playbook create_vm.yaml`  
+    - *Command:* `sudo ansible-playbook create_vm.yaml`  
     -   Requirements: vars  
+    - Automation:
+        - Completely automated VM instance spin up, attach with subnet and will also get ip address from dhcp server from subnet as well as controller network.
+        - Provider adming able to ssh to this new vm without any manual ssh keypair generation manual steps.
 
 - Read:
 User should be able to ssh inside the VM he/she has requested for. 
