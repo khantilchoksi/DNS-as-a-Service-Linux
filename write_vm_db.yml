@@ -76,12 +76,17 @@
 
     - name: Convert dict to json
       set_fact:
-        new_db_json: "{{ vms[item] | to_yaml }}' }}"
+        new_db_json: "{{ vms[item] | to_yaml }}"
+      with_items: "{{ vms | list }}"
+
+    - name: Key vm name
+      set_fact:
+        key_item: "{{ vms[item].vm_name }}"
       with_items: "{{ vms | list }}"
 
     - name: Append new vpc to database file
       set_fact:
-        new_db: "{{ existing_db | combine(vms) }}"
+        new_db: "{{ existing_db | combine({key_item: vms}) }}"
       #with_items: "{{ vms | list }}"
     
     # Debug new database

@@ -81,7 +81,7 @@
 
     - name: Append new vpc to database file
       set_fact:
-        new_db: "{{ existing_db | combine(vpcs) }}"
+        new_db: "{{ existing_db | combine({key_item: vpcs}) }}"
       #with_items: "{{ vpcs | list }}"
     
     # Debug new database

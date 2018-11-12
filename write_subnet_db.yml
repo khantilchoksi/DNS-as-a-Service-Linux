@@ -77,12 +77,17 @@
 
     - name: Convert dict to json
       set_fact:
-        new_db_json: "{{ subnets[item] | to_yaml }}' }}"
+        new_db_json: "{{ subnets[item] | to_yaml }}"
+      with_items: "{{ subnets | list }}"
+
+    - name: Key subnet name
+      set_fact:
+        key_item: "{{ subnets[item].subnet_name }}"
       with_items: "{{ subnets | list }}"
 
     - name: Append new vpc to database file
       set_fact:
-        new_db: "{{ existing_db | combine(subnets) }}"
+        new_db: "{{ existing_db | combine({key_item: subnets}) }}"
       #with_items: "{{ subnets | list }}"
     
     # Debug new database
