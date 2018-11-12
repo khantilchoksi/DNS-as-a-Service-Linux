@@ -1,0 +1,7 @@
+---
+vpcs:
+  t2:   # Tenant Name
+    vpc_name: t2vpc1
+    vpc_gateway: 62.0.0.2/24
+    provider_gateway: 62.0.0.1/24
+    provider_gateway_ip: 62.0.0.1

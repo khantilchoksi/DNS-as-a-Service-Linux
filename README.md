@@ -12,7 +12,7 @@ Functional Documentation of Infrastructure automation:
 
 --------------
 
-#### Subnet CRUD: Ref: 
+#### Subnet CRUD:
 - Create:  
 - Read:  
 - Update:  
@@ -35,11 +35,14 @@ Tenant / User should be able to update the VPC id, i.e. putting the existing VM,
 Tenant should be able to terminate, restart VM.
 - Delete: Destroying the whole VM and free up memory.
 
+Prerequisties for scripts:  
+- In the hypervisor, you should have dns.img and centos7-minimal.img in images folder, which has preconfigured dhcp client and dns images has bind9, firewall settings pre-configured.
 -----------------
 #### DNS Server CRUD
-Create: 
-Read:
-Update:
+- Create: Create DNS Server  
+    - *Command:* `sudo ansible-playbook create_vm.yaml`
+- Read:
+- Update:
 
 -------------------
 ### References: 

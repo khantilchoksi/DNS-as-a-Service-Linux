@@ -1,0 +1,25 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+
+  tasks:
+  - name: load var from file
+    slurp:
+      src: /tmp/var.json
+    register: imported_var
+
+  - debug:
+      msg: "{{ imported_var.content|b64decode|from_json }}"
+
+  - name: append more key/values
+    set_fact:
+      imported_var: "{{ imported_var.content|b64decode|from_json | default([]) | combine({ 'hello': 'world' }) }}"
+
+  - debug:
+      var: imported_var
+
+  - name: write var to file
+    copy: 
+      content: "{{ imported_var | to_nice_json }}" 
+      dest: /tmp/final.json
