@@ -79,9 +79,14 @@
         new_db_json: "{{ dns_vms[item] | to_yaml }}' }}"
       with_items: "{{ dns_vms | list }}"
 
+    - name: Key
+      set_fact:
+        key_item: "{{ dns_vms[item].dns_vm_name' }}"
+      with_items: "{{ dns_vms | list }}"
+
     - name: Append new vpc to database file
       set_fact:
-        new_db: "{{ existing_db | combine(dns_vms) }}"
+        new_db: "{{ existing_db | combine({key_item: dns_vms}) }}"
       #with_items: "{{ dns_vms | list }}"
     
     # Debug new database

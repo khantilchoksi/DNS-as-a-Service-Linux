@@ -1,7 +1,7 @@
 ---
 dns_vms:
     t2:
-       dns_vm_name: dns_t2vpc2
+       dns_vm_name: dns_t2vpc3
        bridge_name: t2_dns_sw
        network_name: t2_dns_net
        bridge_type: bridge
