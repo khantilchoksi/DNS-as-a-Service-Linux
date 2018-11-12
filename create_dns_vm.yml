@@ -5,17 +5,19 @@
     vm_disk_location: /var/lib/libvirt/images
     dns_image_location: /home/ece792/images/dns.img
     root_pass: root
-    dns_vms:
-      dns_t2vpc1:
-        dns_vm_name: dns_t2vpc1
-        bridge_name: t2_dns_sw
-        network_name: t2_dns_net
-        bridge_type: bridge
-        gateway_address: 25.0.0.1/24
-        subnet_ip: 25.0.0.0/24
-        dhcp_range: 25.0.0.2,25.0.0.250,12h
-        vpc_name: t2vpc1
-        controller_network: controller_net
+  vars_files:
+    - dns_vm_vars.yml
+#    dns_vms:
+#      dns_t2vpc1:
+#        dns_vm_name: dns_t2vpc1
+#        bridge_name: t2_dns_sw
+#        network_name: t2_dns_net
+#        bridge_type: bridge
+#        gateway_address: 25.0.0.1/24
+#        subnet_ip: 25.0.0.0/24
+#        dhcp_range: 25.0.0.2,25.0.0.250,12h
+#        vpc_name: t2vpc1
+#        controller_network: controller_net
 
   tasks:
     - debug:

@@ -1,0 +1,12 @@
+$TTL 86400
+@   IN  SOA    org. root.org. (
+        2011071001  ;Serial
+        10        ;Refresh
+        5        ;Retry
+        10      ;Expire
+        20       ;Minimum TTL
+)
+@	IN  NS		t2a.org.
+@	IN  A		192.168.219.9
+web.t2a	IN  NS		t2a.org.
+t2a	IN  A		192.168.219.9
