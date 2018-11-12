@@ -11,8 +11,10 @@
     # Create tenant directory if not available
     - name: Create tenant directory if not available
       file:
-        path: "/home/ece792/tenants/{{item}}"
+        path: "./tenants/{{item}}"
         state: directory
+        owner: ece792
+        group: ece792
         mode: 0666
         recurse: yes
       with_items: "{{ vpcs.keys()}}"
@@ -22,8 +24,10 @@
     - name: Making sure database file exists
       copy:
         content: ""
-        dest: "/home/ece792/tenants/{{item}}/vpc_db.json"
+        dest: "./tenants/{{item}}/vpc_db.json"
         force: no
+        owner: ece792
+        group: ece792
         mode: 0666
       with_items: "{{ vpcs.keys() }}"
       become: yes
@@ -31,7 +35,7 @@
     # Load database from file
     - name: Load database from file
       slurp:
-        src: "/home/ece792/tenants/{{item}}/vpc_db.json"
+        src: "./tenants/{{item}}/vpc_db.json"
       register: vpc_db
       with_items: "{{ vpcs.keys()}}"
       become: yes

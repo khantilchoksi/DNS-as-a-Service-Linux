@@ -1,0 +1,16 @@
+$TTL 86400
+@   IN  SOA     api.apidns.t1a.com. root.apidns.t1a.com. (
+        2011071001  ;Serial
+        3600        ;Refresh
+        1800        ;Retry
+        604800      ;Expire
+        86400       ;Minimum TTL
+)
+@       IN  NS          api.apidns.t1a.com.
+@       IN  A           192.168.219.6
+;@       IN  A           10.0.0.30
+;@       IN  A           10.0.0.40
+api     IN  A           10.0.0.30
+api     IN  A           10.0.0.40
+;*      IN  A           10.0.0.40
+

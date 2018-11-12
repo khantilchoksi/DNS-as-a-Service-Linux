@@ -1,0 +1,12 @@
+$TTL 86400
+@   IN  SOA     t1a.com. root.t1a.com. (
+        2011071001  ;Serial
+        10        ;Refresh
+        5        ;Retry
+        10      ;Expire
+        800       ;Minimum TTL
+)
+@       IN  NS          apidns.t1a.com.
+@       IN  A           192.168.219.2
+api.apidns      IN  NS          apidns.t1a.com.
+apidns  IN  A           192.168.219.6
