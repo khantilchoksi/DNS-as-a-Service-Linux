@@ -5,15 +5,8 @@
     vm_disk_location: /var/lib/libvirt/images
     centos_image_location: /home/ece792/images/dns.img
     root_pass: root
-    vms:
-      t2vm1:
-        vm_name: t2vm1
-        subnet_name: t2sub1
-        vpc_name: t2vpc1
-        os_type: centos7_minimal
-        memory: 524 # in MBits
-        vcpus: 2
-        controller_network: controller_net
+  vars_files:
+    - vm_vars.yml
 
   tasks:
     - debug:
@@ -58,4 +51,8 @@
         command: create
       with_items: "{{ vms | list }}"
       become: yes
+
+    # Write to database or run this script seperately from shell
+    - name: Writing this newly created VM to DB
+      include: write_vm_db.yml
     

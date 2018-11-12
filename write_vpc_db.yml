@@ -3,7 +3,8 @@
   gather_facts: false
   vars:
     new_db: ""
-  vars_files: vpc_vars.yml
+  vars_files: 
+    - vpc_vars.yml
   tasks:
     - debug:
         msg: "{{vpcs}}"

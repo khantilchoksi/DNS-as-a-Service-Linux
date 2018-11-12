@@ -1,6 +1,6 @@
 ---
 dns_vms:
-    dns_t2vpc2:
+    t2:
        dns_vm_name: dns_t2vpc2
        bridge_name: t2_dns_sw
        network_name: t2_dns_net

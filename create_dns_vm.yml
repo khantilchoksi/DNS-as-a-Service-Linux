@@ -7,17 +7,6 @@
     root_pass: root
   vars_files:
     - dns_vm_vars.yml
-#    dns_vms:
-#      dns_t2vpc1:
-#        dns_vm_name: dns_t2vpc1
-#        bridge_name: t2_dns_sw
-#        network_name: t2_dns_net
-#        bridge_type: bridge
-#        gateway_address: 25.0.0.1/24
-#        subnet_ip: 25.0.0.0/24
-#        dhcp_range: 25.0.0.2,25.0.0.250,12h
-#        vpc_name: t2vpc1
-#        controller_network: controller_net
 
   tasks:
     - debug:
@@ -148,4 +137,8 @@
         command: create
       with_items: "{{ dns_vms | list }}"
       become: yes
+
+    # Write to database or run this script seperately from shell
+    - name: Writing this newly created DNS VM to DB
+      include: write_dns_vm_db.yml
     

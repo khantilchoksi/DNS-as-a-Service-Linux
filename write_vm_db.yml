@@ -4,11 +4,10 @@
   vars:
     new_db: ""
   vars_files: 
-    - subnet_vars.yml
-
+    - vm_vars.yml
   tasks:
     - debug:
-        msg: "{{subnets}}"
+        msg: "{{vms}}"
     
     # Create tenant directory if not available
     - name: Create tenant directory if not available
@@ -19,27 +18,27 @@
         group: ece792
         mode: 0666
         recurse: yes
-      with_items: "{{ subnets.keys()}}"
+      with_items: "{{ vms.keys()}}"
       become: yes
         
     # Create database file if doesn't exist
     - name: Making sure database file exists
       copy:
         content: ""
-        dest: "/home/ece792/tenants/{{item}}/subnet_db.json"
+        dest: "/home/ece792/tenants/{{item}}/vms_db.json"
         force: no
         owner: ece792
         group: ece792
         mode: 0666
-      with_items: "{{ subnets.keys() }}"
+      with_items: "{{ vms.keys() }}"
       become: yes
 
     # Load database from file
     - name: Load database from file
       slurp:
-        src: "/home/ece792/tenants/{{item}}/subnet_db.json"
+        src: "/home/ece792/tenants/{{item}}/vms_db.json"
       register: vpc_db
-      with_items: "{{ subnets.keys()}}"
+      with_items: "{{ vms.keys()}}"
       become: yes
 
     - name: Read content register
@@ -77,13 +76,13 @@
 
     - name: Convert dict to json
       set_fact:
-        new_db_json: "{{ subnets[item] | to_yaml }}' }}"
-      with_items: "{{ subnets | list }}"
+        new_db_json: "{{ vms[item] | to_yaml }}' }}"
+      with_items: "{{ vms | list }}"
 
     - name: Append new vpc to database file
       set_fact:
-        new_db: "{{ existing_db | combine(subnets) }}"
-      #with_items: "{{ subnets | list }}"
+        new_db: "{{ existing_db | combine(vms) }}"
+      #with_items: "{{ vms | list }}"
     
     # Debug new database
     - name: Debug new database
@@ -93,5 +92,5 @@
     - name: Write db back to file
       copy: 
         content: "{{ new_db | to_nice_json }}" 
-        dest: "/home/ece792/tenants/{{item}}/subnet_db.json"
-      with_items: "{{ subnets.keys() }}"
+        dest: "/home/ece792/tenants/{{item}}/vms_db.json"
+      with_items: "{{ vms.keys() }}"

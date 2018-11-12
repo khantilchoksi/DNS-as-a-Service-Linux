@@ -5,16 +5,8 @@
     vm_disk_location: /var/lib/libvirt/images
     root_pass: root
     provider_namespace: provider_ns
-    subnets:
-      t2sub1:
-        subnet_name: t2sub1
-        vpc_name: t2vpc1
-        subnet_range: 22.0.0.0/24
-        vpc_gateway: 22.0.0.1/24
-        dhcp_range: 22.0.0.2,22.0.0.250,12h 
-
-  vars_files:
-
+  vars_files: 
+    - subnet_vars.yml
 
   tasks:
     - debug:
@@ -93,3 +85,7 @@
       with_items: "{{ subnets | list }}"
       ignore_errors: true
       become: yes
+
+    # Write to database or run this script seperately from shell
+    - name: Writing this newly created subnet to DB
+      include: write_subnet_db.yml

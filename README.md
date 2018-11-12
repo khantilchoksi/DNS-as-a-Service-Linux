@@ -44,6 +44,20 @@ Prerequisties for scripts:
 - Read:
 - Update:
 
+
+-------------------
+### Clients:
+It is assumed that client will perform following steps in order to build their infrastructure.  
+- Will upload file first for VPC creation `vpc_vars.yml`  
+- Upload file first for subnet creation `subnet_vars.yml`  
+- Upload file first for dns in his VPC creation `dns_vm_vars.yml`  
+- Upload file first for guest vm or server vm inside subnet and vpc creation `vm_vars.yml`  
+
+ ------------------------------  
+
+### Notes:  
+- All the ansible scripts / tasks written are idempotent meaning if a client runs the same parameters, our end system won't be affected. 
+- All the duplication checks are done in the playbook and accordingly tasks are run.  
 -------------------
 ### References: 
 - https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html

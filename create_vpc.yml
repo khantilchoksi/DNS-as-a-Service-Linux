@@ -5,12 +5,8 @@
     vm_disk_location: /var/lib/libvirt/images
     root_pass: root
     provider_namespace: provider_ns
-    vpcs:
-      t2vpc1:
-        vpc_name: t2vpc1
-        vpc_gateway: 62.0.0.2/24
-        provider_gateway: 62.0.0.1/24
-        provider_gateway_ip: 62.0.0.1
+  vars_files: 
+    - vpc_vars.yml
 
   tasks:
     - debug:
@@ -72,3 +68,7 @@
       with_items: "{{ vpcs | list }}"
       ignore_errors: true
       become: yes
+
+    # Write to database or run this script seperately from shell
+    - name: Writing this newly created VPC to DB
+      include: write_vpc_db.yml
