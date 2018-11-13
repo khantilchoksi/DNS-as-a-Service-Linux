@@ -69,6 +69,6 @@
       ignore_errors: true
       become: yes
 
-    # Write to database or run this script seperately from shell
-    - name: Writing this newly created VPC to DB
-      include: write_vpc_db.yml
+    # # Write to database or run this script seperately from shell
+    # - name: Writing this newly created VPC to DB
+    #   include: write_vpc_db.yml
