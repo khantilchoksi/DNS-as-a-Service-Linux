@@ -138,7 +138,7 @@
       with_items: "{{ dns_vms | list }}"
       become: yes
 
-    # Write to database or run this script seperately from shell
-    - name: Writing this newly created DNS VM to DB
-      include: write_dns_vm_db.yml
+    # # Write to database or run this script seperately from shell
+    # - name: Writing this newly created DNS VM to DB
+    #   include: write_dns_vm_db.yml
     

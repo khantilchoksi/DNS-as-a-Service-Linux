@@ -52,7 +52,7 @@
       with_items: "{{ vms | list }}"
       become: yes
 
-    # Write to database or run this script seperately from shell
-    - name: Writing this newly created VM to DB
-      include: write_vm_db.yml
+    # # Write to database or run this script seperately from shell
+    # - name: Writing this newly created VM to DB
+    #   include: write_vm_db.yml
     
