@@ -9,13 +9,5 @@
             "vm_name": "t2vm1",
             "vpc_name": "t2vpc1"
         }
-    },
-    "t2vpc1": {
-        "t2": {
-            "provider_gateway": "62.0.0.1/24",
-            "provider_gateway_ip": "62.0.0.1",
-            "vpc_gateway": "62.0.0.2/24",
-            "vpc_name": "t2vpc1"
-        }
     }
 }

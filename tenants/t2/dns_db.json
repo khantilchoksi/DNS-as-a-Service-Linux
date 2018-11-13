@@ -9,7 +9,7 @@
             "gateway_address": "25.0.0.1/24",
             "network_name": "t2_dns_net",
             "subnet_ip": "25.0.0.0/24",
-            "vpc_name": "t2vpc1"
+            "vpc_name": "t2vpc2"
         }
     },
     "dns_t2vpc3": {
@@ -22,7 +22,7 @@
             "gateway_address": "25.0.0.1/24",
             "network_name": "t2_dns_net",
             "subnet_ip": "25.0.0.0/24",
-            "vpc_name": "t2vpc1"
+            "vpc_name": "t2vpc3"
         }
     }
 }
