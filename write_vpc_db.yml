@@ -79,6 +79,11 @@
         new_db_json: "{{ vpcs[item] | to_yaml }}' }}"
       with_items: "{{ vpcs | list }}"
 
+    - name: Key vm name
+      set_fact:
+        key_item: "{{ vpcs[item].vpc_name }}"
+      with_items: "{{ vpcs | list }}"
+
     - name: Append new vpc to database file
       set_fact:
         new_db: "{{ existing_db | combine({key_item: vpcs}) }}"
