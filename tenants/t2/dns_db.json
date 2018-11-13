@@ -1,0 +1,28 @@
+{
+    "dns_t2vpc2": {
+        "t2": {
+            "bridge_name": "t2_dns_sw",
+            "bridge_type": "bridge",
+            "controller_network": "controller_net",
+            "dhcp_range": "25.0.0.2,25.0.0.250,12h",
+            "dns_vm_name": "dns_t2vpc2",
+            "gateway_address": "25.0.0.1/24",
+            "network_name": "t2_dns_net",
+            "subnet_ip": "25.0.0.0/24",
+            "vpc_name": "t2vpc1"
+        }
+    },
+    "dns_t2vpc3": {
+        "t2": {
+            "bridge_name": "t2_dns_sw",
+            "bridge_type": "bridge",
+            "controller_network": "controller_net",
+            "dhcp_range": "25.0.0.2,25.0.0.250,12h",
+            "dns_vm_name": "dns_t2vpc3",
+            "gateway_address": "25.0.0.1/24",
+            "network_name": "t2_dns_net",
+            "subnet_ip": "25.0.0.0/24",
+            "vpc_name": "t2vpc1"
+        }
+    }
+}
