@@ -18,7 +18,7 @@ Functional Documentation of Infrastructure automation:
 - **Read:** List down all the VPC ids for a tenant.   
         E.g. `sudo cat /home/ece792/tenants/t2/vpc_db.json`.
 - **Update:** There couldn't be any updates as for VPC.
-- **Delete:** Remove the VPC for the tenant, which may force to destroy deletion of all VMs running inside the VPC. 
+- **Delete:** Remove the VPC for the tenant, which may force to destroy deletion of all VMs running inside the VPC. (automated as python script)
 
 --------------
 
@@ -34,7 +34,7 @@ Functional Documentation of Infrastructure automation:
 - **Read:** List down all the subnets for a tenant.   
             E.g. `sudo cat /home/ece792/tenants/t2/subnet_db.json`.
 - **Update:** Tenant can change the subnet CIDR block by logging into his controller VM and run the dhcp server again on that interface. But in the practice it is not recommended. Instead, create a new subnet. (manual task)
-- **Delete:** Shutoff all the VMs connected to this subnet and delete subnet L2 bridge. 
+- **Delete:** Shutoff all the VMs connected to this subnet and delete subnet L2 bridge. (automated as python script)
 
 ----------------
 ### VM Instance CRUD:
@@ -57,7 +57,7 @@ Functional Documentation of Infrastructure automation:
 - **Update:**
 Tenant / user should be able to update the VPC id, i.e. putting the existing VM, add interfaces. Tenant is able to terminate, restart VM. (Manual task)
 
-- **Delete:** Destroying the VM and free up memory.
+- **Delete:** Destroying the VM and free up memory. (automated as python script)
 
 -----------------
 #### DNS Server:
@@ -71,7 +71,16 @@ Tenant / user should be able to update the VPC id, i.e. putting the existing VM,
 - **Read:** Each tenant's database of DNS servers is maintained inside the tenants folder in hypevisor.   
 E.g. `/home/ece792/tenants/t2/dns_db.json`  
 
-- **Delete:** Destroying the DNS server VM.
+- **Delete:** Destroying the DNS server VM. (automated as python script)
+
+
+------------------------------
+
+### Deletion of VPC, Subnet, VM instance and DNS instance:  
+- We have written a single python script for deletion of VPC, subnet and VM instnaces.  
+-   Run command:   
+        `sudo python delete_script.py`  
+    and then it will ask user which VPC, subnet and VM instance to delete. So, it is totally interactive deletion script.
 
 -------------------
 ### Clients:
