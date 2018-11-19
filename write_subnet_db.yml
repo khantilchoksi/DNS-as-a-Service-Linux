@@ -85,6 +85,11 @@
         key_item: "{{ subnets[item].subnet_name }}"
       with_items: "{{ subnets | list }}"
 
+    - name: Set fact if empty
+      set_fact:
+         existing_db: {}
+      when: existing_db == ""
+
     - name: Append new vpc to database file
       set_fact:
         new_db: "{{ existing_db | combine({key_item: subnets}) }}"

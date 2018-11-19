@@ -84,6 +84,11 @@
         key_item: "{{ dns_vms[item].dns_vm_name }}"
       with_items: "{{ dns_vms | list }}"
 
+    - name: Set fact if empty
+      set_fact:
+         existing_db: {}
+      when: existing_db == ""
+
     - name: Append new vpc to database file
       set_fact:
         new_db: "{{ existing_db | combine({key_item: dns_vms}) }}"
