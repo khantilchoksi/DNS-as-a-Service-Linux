@@ -65,6 +65,13 @@
       ignore_errors: true
       become: yes
 
+    # Turn hypervisor interface up
+    - name: Turn hypervisor interface up
+      command: "ifconfig {{subnets[item].subnet_name}}vif2 up"
+      with_items: "{{ subnets | list }}"
+      ignore_errors: true
+      become: yes
+
     # Assign ip to vethpair interface inside vpc namespace
     - name: Add vethpair interface to namespace
       command: "ip netns exec {{subnets[item].vpc_name}}_ns ifconfig {{subnets[item].subnet_name}}vif1 {{subnets[item].vpc_gateway}} up"
