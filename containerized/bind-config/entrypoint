@@ -23,6 +23,9 @@ fi
 if [[ -z ${1} ]]; then
   echo "Starting DNS service..."
   sed 's/#PermitRootLogin/PermitRootLogin/' < /etc/ssh/sshd_config > /etc/ssh/sshd_config
+  exec /usr/sbin/init
+  exec 'systemctl restart sshd'
+  exec 'echo -e "root\nroot" | passwd'
   exec /usr/sbin/named -4 -u named -c /etc/named.conf -g ${EXTRA_ARGS}
   
 else
