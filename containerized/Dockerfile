@@ -10,6 +10,12 @@ RUN rndc-confgen -a -c /etc/rndc.key && \
     chown named:named /etc/rndc.key && \
     chmod 755 /entrypoint
 
+# Install IP-UTILS
+RUN yum install -y net-tools && \
+    yum install -y iputils-ping && \
+    yum install -y iproute2 && \
+    yum clean all
+
 EXPOSE 53/udp 53/tcp
 
 
