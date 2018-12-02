@@ -12,10 +12,7 @@ RUN rndc-confgen -a -c /etc/rndc.key && \
 
 EXPOSE 53/udp 53/tcp
 
-# Labels consumed by Nulecule Specification
-# Volumes:
-#  * /named   - this is where all the named data lives
-# LABEL io.projectatomic.nulecule.volume.data="/named,128Mi"
+
 # VOLUME [ "/named" ]
 ENTRYPOINT [ "/entrypoint"]
 CMD [ "/usr/sbin/named" ]
