@@ -5,8 +5,8 @@ set -x
 init_config() {
   mv /named.conf.default /etc/named.conf
   mkdir /var/named/log
-  chmod -R 0755 /var/named/log
-  chown -R root:named /var/named/log
+  chmod -R 0777 /var/named/log
+  chown -R named:named /var/named/log
 }
 
 # Main Shell Script
