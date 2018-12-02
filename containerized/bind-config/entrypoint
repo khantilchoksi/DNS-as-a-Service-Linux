@@ -2,6 +2,15 @@
 
 set -x
 
+init_config() {
+  mv /named.conf.default /named/etc/named.conf
+  mkdir /var/named/log
+  chmod -R 0755 /var/named/log
+  chown -R root:named /var/named/log
+}
+
+# Main Shell Script
+init_config
 
 if [[ ${1:0:1} = '-' ]]; then
   EXTRA_ARGS="$@"
@@ -12,7 +21,7 @@ elif [[ ${1} == '/usr/sbin/named' ]]; then
 fi
 
 if [[ -z ${1} ]]; then
-  echo "Starting named..."
+  echo "Starting DNS service..."
   exec /usr/sbin/named -4 -u named -c /etc/named.conf -g ${EXTRA_ARGS}
 else
   exec "$@"
