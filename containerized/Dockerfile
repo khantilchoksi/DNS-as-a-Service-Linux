@@ -2,7 +2,27 @@
 # it is IPv4 only
 
 FROM centos:centos7
-MAINTAINER The CentOS Project <cloud-ops@centos.org>
+MAINTAINER "s" s@abc.com
+ENV container docker
+RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in ; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done);
+RUN rm -rf /lib/systemd/system/multi-user.target.wants/;
+RUN rm -rf /etc/systemd/system/.wants/;
+RUN rm -rf /lib/systemd/system/local-fs.target.wants/;
+RUN rm -rf /lib/systemd/system/sockets.target.wants/udev;
+RUN rm -rf /lib/systemd/system/sockets.target.wants/initctl;
+RUN rm -rf /lib/systemd/system/basic.target.wants/;
+RUN rm -rf /lib/systemd/system/anaconda.target.wants/*;
+RUN yum install -y net-tools
+RUN yum install -y openssh-server
+VOLUME ["/sys/fs/cgroup"]
+CMD ["/usr/sbin/init"]
+
+#RUN sed 's/#PermitRootLogin/PermitRootLogin/' < /etc/ssh/sshd_config > /etc/ssh/sshd_config
+
+#RUN systemctl restart sshd
+#RUN passwd
+#RUN root
+#RUN root
 
 # Labels consumed by OpenShift
 LABEL io.k8s.description="ISC BIND is open source software that implements the Domain Name System (DNS) protocols for the Internet" \
@@ -43,5 +63,5 @@ LABEL io.projectatomic.nulecule.volume.data="/named,128Mi"
 VOLUME [ "/named" ]
 
 # start services:
-ENTRYPOINT [ "/entrypoint"]
+ENTRYPOINT [ "docker-entrypoint.sh"]
 CMD [ "/usr/sbin/named" ]
