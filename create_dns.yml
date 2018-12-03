@@ -37,7 +37,7 @@
         tty: yes
         detach: yes
         published_ports:
-          - "{dns_containers[item].publish_port}:{dns_containers[item].publish_port}/udp"
+          - "{{dns_containers[item].publish_port}}:{{dns_containers[item].publish_port}}/udp"
       with_items: "{{ dns_containers | list }}"
 
     

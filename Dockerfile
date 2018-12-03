@@ -11,13 +11,13 @@ RUN rndc-confgen -a -c /etc/rndc.key && \
     chmod 755 /entrypoint
 
 # Install IP-UTILS
-RUN yum install -y net-tools && \
-    yum install -y iputils-ping && \
-    yum install -y iproute2 && \
+RUN yum -y update && \
+    yum install -y net-tools && \
+    yum install -y iputils && \
+    yum install -y iproute && \
     yum clean all
 
 EXPOSE 53/udp 53/tcp
-
 
 # For configuring OPEN-SSH
 RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in ; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done);
