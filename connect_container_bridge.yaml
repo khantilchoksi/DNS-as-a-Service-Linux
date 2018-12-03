@@ -47,6 +47,20 @@
     become: yes
     ignore_errors: true
 
+  # Change Resolve.conf file
+  - name: Get the ip address assigned to DNS container
+    command: "docker inspect -f {%raw%}'{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'{%endraw%} {{container_name}}"
+    become: yes
+    register: container_ip
+
+  - debug:
+      msg: "{{container_ip}}"
+
+  # Change Resolve.conf file
+  - name: Change Resolve.conf file
+    command: "nsenter -t {{container_pid.stdout}} -n echo nameserver {{container_ip}} > /etc/resolv.conf"
+    become: yes
+
   # # Assign ip to LC1 container interface
   # - name: Remove previous default route to default network
   #   command: "nsenter -t {{container_pid.stdout}} -n ip route del default"
