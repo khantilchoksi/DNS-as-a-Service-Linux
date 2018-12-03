@@ -15,13 +15,13 @@
     ignore_errors: true
 
   # Attach brvif2 to bridge
-  - name: Attach brvif2 to bridge
+  - name: Attach vif2 to bridge
     command: "brctl addif {{bridge_name}} {{interface_prefix}}vif2"
     become: yes
     ignore_errors: true
 
   # Make the brvif2 up
-  - name: Make the brvif2 up
+  - name: Make the vif2 up
     command: "ifconfig {{interface_prefix}}vif2 up"
     become: yes
 
@@ -54,12 +54,12 @@
     register: container_ip
 
   - debug:
-      msg: "{{container_ip}}"
+      msg: "{{Container IP: container_ip.stdout}}"
 
   # Change Resolve.conf file
-  - name: Change Resolve.conf file
-    command: "nsenter -t {{container_pid.stdout}} -n echo nameserver {{container_ip.stdout}} > /etc/resolv.conf"
-    become: yes
+  # - name: Change Resolve.conf file
+  #   command: "nsenter -t {{container_pid.stdout}} -n echo nameserver {{container_ip.stdout}} > /etc/resolv.conf"
+  #   become: yes
 
   # # Assign ip to LC1 container interface
   # - name: Remove previous default route to default network
