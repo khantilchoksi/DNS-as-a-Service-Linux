@@ -23,12 +23,6 @@ RUN rm -rf /lib/systemd/system/sockets.target.wants/initctl;
 RUN rm -rf /lib/systemd/system/basic.target.wants/;
 RUN rm -rf /lib/systemd/system/anaconda.target.wants/*;
 RUN yum install -y openssh-server
-RUN sed "s/#PermitRootLogin/PermitRootLogin/" < /etc/ssh/sshd_config > op.txt
-RUN cp op.txt /etc/ssh/sshd_config
-RUN mkdir -p /root/.ssh
-ADD ./id_rsa.pub /root/.ssh/authorized_keys
-RUN chmod 700 /root/.ssh
-RUN chmod 640 /root/.ssh/authorized_keys
 VOLUME [ "/sys/fs/cgroup"]
 
 # VOLUME [ "/named" ]
