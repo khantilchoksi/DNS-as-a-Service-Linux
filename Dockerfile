@@ -15,6 +15,7 @@ RUN yum -y update && \
     yum install -y net-tools && \
     yum install -y iputils && \
     yum install -y iproute && \
+    yum install -y dhclient && \
     yum clean all
 
 EXPOSE 53/udp 53/tcp

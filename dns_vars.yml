@@ -3,7 +3,6 @@ dns_containers:
     t2:
        dns_name: dns_t2vpc5
        subnet_name: t2_dns1
-       gateway_address: 26.0.0.1/24
        publish_port: 71
        zone_name: t2b
        vpc_name: t2vpc1

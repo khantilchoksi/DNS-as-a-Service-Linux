@@ -3,6 +3,7 @@
   #   container_name: cont1
   #   bridge_name: "subnet_bridge"
 
+
   # Set interface prefix
   - name: Veth Pair Interface prefix
     set_fact:
@@ -41,10 +42,10 @@
     become: yes
 
   # Assign ip to LC1 container interface
-  # - name: Attach brvif1 to container
-  #   command: "nsenter -t {{container_pid.stdout}} -n ip addr add {{interface_ip}} dev {{interface_prefix}}vif1"
-  #   become: yes
-  #   ignore_errors: true
+  - name: Run dhclient
+    command: "nsenter -t {{container_pid.stdout}} -n dhclient {{interface_prefix}}vif1"
+    become: yes
+    ignore_errors: true
 
   # # Assign ip to LC1 container interface
   # - name: Remove previous default route to default network
