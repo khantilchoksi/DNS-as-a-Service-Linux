@@ -58,7 +58,7 @@
 
   # Change Resolve.conf file
   - name: Change Resolve.conf file
-    command: "nsenter -t {{container_pid.stdout}} -n echo nameserver {{container_ip}} > /etc/resolv.conf"
+    command: "nsenter -t {{container_pid.stdout}} -n echo nameserver {{container_ip.stdout}} > /etc/resolv.conf"
     become: yes
 
   # # Assign ip to LC1 container interface
