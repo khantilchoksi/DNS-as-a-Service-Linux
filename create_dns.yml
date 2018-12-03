@@ -4,6 +4,8 @@
   vars:
     root_pass: root
     docker_image: bind_centos
+    packages:
+       - docker
   vars_files:
     - dns_vars.yml
 
@@ -11,11 +13,11 @@
     - debug:
          msg: "{{dns_containers}}"
   
-    # Install required packages
-#    - name: Install required packages for libvirt, lxml
-#      apt: 
-#        name: "{{packages}}"
-#      become: yes
+  # Install required packages
+    - name: Install required packages for libvirt, lxml
+      apt: 
+        name: "{{packages}}"
+      become: yes
 
    # Create docker image if not exists
     - name: Create docker image if not exists
