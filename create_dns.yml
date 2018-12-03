@@ -1,0 +1,49 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    root_pass: root
+    docker_image: bind_centos
+  vars_files:
+    - dns_vars.yml
+
+  tasks:
+    - debug:
+         msg: "{{dns_containers}}"
+  
+    # Install required packages
+#    - name: Install required packages for libvirt, lxml
+#      apt: 
+#        name: "{{packages}}"
+#      become: yes
+
+   # Create docker image if not exists
+    - name: Create docker image if not exists
+      docker_image:
+        path: .
+        name: "{{docker_image}}"
+        state: present
+
+    # Create container for dns
+    - name: Create and start container for dns if already not present
+      docker_container:
+        name: "{{dns_containers[item].dns_name}}"
+        image: "{{docker_image}}"
+        state: started
+        privileged: yes
+        interactive: yes
+        tty: yes
+        detach: yes
+        published_ports:
+          - "{dns_containers[item].publish_port}:{dns_containers[item].publish_port}/udp"
+      with_items: "{{ dns_containers | list }}"
+
+    
+    # Connect Container with bridge
+    - name: Connect Container with bridge
+      include_tasks: connect_container_bridge.yaml
+      vars:
+        container_name: "{{dns_containers[item].dns_name}}"
+        bridge_name: "{{dns_containers[item].subnet_name}}"
+      with_items: "{{ dns_containers | list }}"
+    
