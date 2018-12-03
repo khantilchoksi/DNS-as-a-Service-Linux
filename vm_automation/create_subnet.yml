@@ -18,7 +18,24 @@
       with_items: "{{ subnets | list }}"
       ignore_errors: true
       become: yes
+    
+    # Define a new network
+    - name: Define Virtual Network
+      virt_net:
+        command: define
+        name: "{{subnets[item].subnet_name}}"
+        xml: "{{ lookup('template', 'templates/subnet_bridge_template.xml.j2' ) }}"
+      with_items: "{{ subnets | list }}"
+      ignore_errors: true
 
+    # Create and start a network
+    - name: Create Virtual Network if not created
+      virt_net:
+        command: create
+        name: "{{ subnets[item].subnet_name }}"
+      with_items: "{{ subnets | list }}"
+      ignore_errors: true
+      become: yes
   
     # Set interface bridge up
     - name: Set Interface of bridges up
@@ -49,14 +66,14 @@
       become: yes
 
     # Turn hypervisor interface up
-    - name: Turn hypervisor interface up which is connected with bridge
+    - name: Turn hypervisor interface up
       command: "ifconfig {{subnets[item].subnet_name}}vif2 up"
       with_items: "{{ subnets | list }}"
       ignore_errors: true
       become: yes
 
     # Assign ip to vethpair interface inside vpc namespace
-    - name: Make the veth pair interface inside namespace up
+    - name: Add vethpair interface to namespace
       command: "ip netns exec {{subnets[item].vpc_name}}_ns ifconfig {{subnets[item].subnet_name}}vif1 {{subnets[item].vpc_gateway}} up"
       with_items: "{{ subnets | list }}"
       ignore_errors: true
