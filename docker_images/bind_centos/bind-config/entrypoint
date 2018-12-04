@@ -22,7 +22,6 @@ init_config() {
 
     mv /etc/named.* /named/etc/
     mv /named.conf.default /named/etc/named.conf
-    mv /forward.com.default /named/var/forward.com
   fi
 
   rm -rf /etc/named
@@ -34,6 +33,7 @@ init_config() {
   if [ ! -d /named/var ]; then
     mkdir -p /named/var/data
     mkdir -p /named/var/dynamic
+    mv /forward.com.default /named/var/forward.com
     chown -R named:named /named/var
   fi
 
