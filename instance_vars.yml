@@ -1,0 +1,7 @@
+---
+servers:
+  t2: # Tenant Name
+    server_name: t2vm6
+    subnet_name: t2_sub3
+    vpc_name: t2vpc1
+    os_type: centos

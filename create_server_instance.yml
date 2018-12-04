@@ -1,0 +1,50 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    docker_filepath: ./docker_images/
+    packages:
+       - docker
+  vars_files:
+    - instance_vars.yml
+
+  tasks:
+    - debug:
+         msg: "{{servers}}"
+ 
+  # Install required packages
+    - name: Install required packages for docker
+      apt: 
+        name: "{{packages}}"
+      become: yes
+
+   # Create docker image if not exists
+    - name: Create docker image if not exists
+      docker_image:
+        path: "{{docker_filepath}}/{{servers[item].os_type}}"
+        name: "my{{servers[item].os_type}}"
+        state: present
+      with_items: "{{ servers | list }}"
+
+    # Create container for dns
+    - name: Create and start container for client server if already not present
+      docker_container:
+        name: "{{servers[item].server_name}}"
+        image: "my{{servers[item].os_type}}"
+        state: started
+        privileged: yes
+        interactive: yes
+        tty: yes
+        detach: yes
+      with_items: "{{ servers | list }}"
+    
+    # Connect Container with bridge
+    - name: Connect Container with bridge
+      include_tasks: connect_container_bridge.yaml
+      vars:
+        container_name: "{{servers[item].server_name}}"
+        bridge_name: "{{servers[item].subnet_name}}"
+      with_items: "{{ servers | list }}"
+    
+
+    

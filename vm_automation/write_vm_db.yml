@@ -1,0 +1,106 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    new_db: ""
+  vars_files: 
+    - vm_vars.yml
+  tasks:
+    - debug:
+        msg: "{{vms}}"
+    
+    # Create tenant directory if not available
+    - name: Create tenant directory if not available
+      file:
+        path: "/home/ece792/tenants/{{item}}"
+        state: directory
+        owner: ece792
+        group: ece792
+        mode: 0666
+        recurse: yes
+      with_items: "{{ vms.keys()}}"
+      become: yes
+        
+    # Create database file if doesn't exist
+    - name: Making sure database file exists
+      copy:
+        content: ""
+        dest: "/home/ece792/tenants/{{item}}/vms_db.json"
+        force: no
+        owner: ece792
+        group: ece792
+        mode: 0666
+      with_items: "{{ vms.keys() }}"
+      become: yes
+
+    # Load database from file
+    - name: Load database from file
+      slurp:
+        src: "/home/ece792/tenants/{{item}}/vms_db.json"
+      register: vpc_db
+      with_items: "{{ vms.keys()}}"
+      become: yes
+
+    - name: Read content register
+      debug: 
+        msg: "{{vpc_db}}"
+
+    - name: Set existing db in a file
+      set_fact:
+        existing_db: "{{ item.content }}"
+      with_items: "{{ vpc_db.results}}"
+
+    # Debug existing database
+    - name: Debug existing database
+      debug:
+         msg: "{{ existing_db}}"
+
+    - name: Decode existing db
+      set_fact:
+        existing_db: "{{ existing_db| b64decode| from_yaml  }}"
+      # with_items: "{{ vpc_db.results}}"
+
+    # Debug existing database
+    - name: Decoded Debug existing database
+      debug:
+         msg: "{{ existing_db}}"
+
+    # Debug existing database
+    - name: Decoded Debug existing database
+      debug:
+         msg: "{{ existing_db | to_yaml}}"
+    # Debug existing database
+    - name: Debug existing database2
+      debug:
+         msg: "{{ existing_db }}"
+
+    - name: Convert dict to json
+      set_fact:
+        new_db_json: "{{ vms[item] | to_yaml }}"
+      with_items: "{{ vms | list }}"
+
+    - name: Key vm name
+      set_fact:
+        key_item: "{{ vms[item].vm_name }}"
+      with_items: "{{ vms | list }}"
+
+    - name: Set fact if empty
+      set_fact:
+         existing_db: {}
+      when: existing_db == ""
+
+    - name: Append new vpc to database file
+      set_fact:
+        new_db: "{{ existing_db | combine({key_item: vms}) }}"
+      #with_items: "{{ vms | list }}"
+    
+    # Debug new database
+    - name: Debug new database
+      debug:
+        msg: "{{new_db}}"
+
+    - name: Write db back to file
+      copy: 
+        content: "{{ new_db | to_nice_json }}" 
+        dest: "/home/ece792/tenants/{{item}}/vms_db.json"
+      with_items: "{{ vms.keys() }}"

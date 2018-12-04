@@ -4,6 +4,7 @@ set -x
 
 init_config() {
   mv /named.conf.default /etc/named.conf
+  mv /forward.com.default /var/named/forward.com
   mkdir /var/named/log
   chmod -R 0777 /var/named/log
   chown -R named:named /var/named/log
@@ -22,6 +23,7 @@ fi
 
 if [[ -z ${1} ]]; then
   echo "Starting DNS service..."
+  sed 's/#PermitRootLogin/PermitRootLogin/' < /etc/ssh/sshd_config > /etc/ssh/sshd_config
   exec /usr/sbin/init
   exec 'systemctl restart sshd'
   exec 'echo -e "root\nroot" | passwd'
