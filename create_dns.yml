@@ -36,6 +36,8 @@
         interactive: yes
         tty: yes
         detach: yes
+        volumes:
+          - "/srv/docker/{{dns_containers[item].dns_name}}:/named"
         published_ports:
           - "{{dns_containers[item].publish_port}}:{{dns_containers[item].publish_port}}/udp"
       with_items: "{{ dns_containers | list }}"

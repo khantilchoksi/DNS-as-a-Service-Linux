@@ -10,10 +10,10 @@
 options {
 	listen-on port 53 { any; };
 	
-	directory 	"/named/var";
-	dump-file 	"/named/var/data/cache_dump.db";
-	statistics-file "/named/var/data/named_stats.txt";
-	memstatistics-file "/named/var/data/named_mem_stats.txt";
+	directory 	"/var/named";
+	dump-file 	"/var/named/data/cache_dump.db";
+	statistics-file "/var/named/data/named_stats.txt";
+	memstatistics-file "/var/named/data/named_mem_stats.txt";
 
   allow-query     { 127.0.0.1; 172.16.0.0/12; };
   allow-query-cache { 127.0.0.1; 172.16.0.0/12; };
@@ -35,9 +35,9 @@ options {
 	dnssec-validation yes;
 
 	/* Path to ISC DLV key */
-	bindkeys-file "/named/etc/named.iscdlv.key";
+	bindkeys-file "/etc/named.iscdlv.key";
 
-	managed-keys-directory "/named/var/dynamic";
+	managed-keys-directory "/var/named/dynamic";
 
 	pid-file "/run/named/named.pid";
 	session-keyfile "/run/named/session.key";
@@ -45,13 +45,13 @@ options {
 
 logging {
         channel log_dns {
-                file "/named/log/named.log" versions 3 size 10m;
+                file "/var/named/log/named.log" versions 3 size 10m;
                 print-category yes;
                 print-severity yes;
                 print-time yes;
         };
         channel log_queries {
-                file "/named/log/named_queries.log" versions 3 size 20m;
+                file "/var/named/log/named_queries.log" versions 3 size 20m;
                 print-category yes;
                 print-severity yes;
                 print-time yes;
@@ -63,7 +63,7 @@ logging {
         category general { log_dns; };
 
         channel log_unmatched{
-                file "/named/log/named_unmatched.log" versions 3 size 20m;
+                file "/var/named/log/named_unmatched.log" versions 3 size 20m;
                 severity info;
                 print-severity yes;
                 print-time yes;
@@ -78,5 +78,12 @@ zone "." IN {
 	file "named.ca";
 };
 
-include "/named/etc/named.rfc1912.zones";
-include "/named/etc/named.root.key";
+zone "com" IN {
+        type master;
+        file "forward.com";
+        allow-update { none; };
+        allow-transfer { any; };
+};
+
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";
