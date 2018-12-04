@@ -28,6 +28,7 @@ RUN rm -rf /lib/systemd/system/sockets.target.wants/udev;
 RUN rm -rf /lib/systemd/system/sockets.target.wants/initctl;
 RUN rm -rf /lib/systemd/system/basic.target.wants/;
 RUN rm -rf /lib/systemd/system/anaconda.target.wants/*;
+RUN yum install -y ipvsadm
 RUN yum install -y openssh-server
 RUN sed "s/#PermitRootLogin/PermitRootLogin/" < /etc/ssh/sshd_config > temp_config.txt
 RUN cp temp_config.txt /etc/ssh/sshd_config

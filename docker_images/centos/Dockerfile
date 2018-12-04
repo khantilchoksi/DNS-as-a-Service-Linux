@@ -2,7 +2,7 @@
 FROM centos:centos7
 
 ADD ./entrypoint /entrypoint
-
+RUN chmod 755 /entrypoint
 # Install IP-UTILS
 RUN yum -y update && \
     yum install -y net-tools && \
@@ -26,7 +26,7 @@ RUN yum install -y openssh-server
 RUN sed "s/#PermitRootLogin/PermitRootLogin/" < /etc/ssh/sshd_config > temp_config.txt
 RUN cp temp_config.txt /etc/ssh/sshd_config
 RUN mkdir -p /root/.ssh
-ADD ../id_rsa.pub /root/.ssh/authorized_keys
+ADD id_rsa.pub /root/.ssh/authorized_keys
 RUN chmod 700 /root/.ssh
 RUN chmod 640 /root/.ssh/authorized_keys
 

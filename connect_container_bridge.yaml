@@ -54,7 +54,7 @@
     register: container_ip
 
   - debug:
-      msg: "{{Container IP: container_ip.stdout}}"
+      msg: "Container IP: {{container_ip.stdout}}"
 
   # Change Resolve.conf file
   # - name: Change Resolve.conf file
