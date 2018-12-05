@@ -2,7 +2,7 @@
 - hosts: localhost
   gather_facts: no
   vars:
-    docker_image: bind_centos
+    docker_image: bind_centos2
     docker_filepath: ./docker_images/bind_centos/
     packages:
        - docker

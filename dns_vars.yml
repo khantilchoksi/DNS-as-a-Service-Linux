@@ -1,8 +1,8 @@
 ---
 dns_containers:
-    t2:
-       dns_name: dns_t2vpc8
-       subnet_name: t2_dns1
-       publish_port: 74
-       zone_name: t2b
-       vpc_name: t2vpc1
+    t4:
+       dns_name: t4_dns
+       subnet_name: t4_dns
+       publish_port: 77
+       zone_name: t4
+       vpc_name: t4vpc1
