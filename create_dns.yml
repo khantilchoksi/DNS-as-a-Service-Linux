@@ -26,6 +26,15 @@
         name: "{{docker_image}}"
         state: present
 
+    # Create shared volum in HV
+    - name: Create shared volum in Hypervisor
+      file: 
+          path: "/srv/docker/{{dns_containers[item].dns_name}}"
+          state: directory
+          mode: 0777
+      with_items: "{{ dns_containers | list }}"
+      become: true
+      
     # Create container for dns
     - name: Create and start container for dns if already not present
       docker_container:
