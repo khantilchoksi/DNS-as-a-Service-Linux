@@ -62,7 +62,7 @@
 
 
     # Configure initial setup in 
-    - name: Connect Container with bridge
+    - name: Configure dns normally
       include_tasks: configure_dns.yaml
       vars:
         container_name: "{{dns_containers[item].dns_name}}"
@@ -70,7 +70,7 @@
       when: dns_containers[item].level == 'vpc'
       with_items: "{{ dns_containers | list }}"
 
-    - name: Connect Container with bridge
+    - name: Configure dns subnet container
       include_tasks: subnet_dns_config.yaml
       vars:
         container_name: "{{dns_containers[item].dns_name}}"

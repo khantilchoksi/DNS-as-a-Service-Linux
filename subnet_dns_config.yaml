@@ -14,6 +14,10 @@
     set_fact:
        dns_server_ip: "{{container_ip.stdout}}"
 
+  - name: Debug Subnet dns ip
+    debug:
+       msg: "Subnet DNS IP : {{container_ip.stdout}}"
+
   # Configure named.conf
   - name: Configure named.conf
     template:
@@ -32,7 +36,7 @@
   
   # Restart named server  
   - name: Restart the named
-    command: "docker exec -it {{container_name}} rndc reload"
+    command: "docker exec -itd {{container_name}} rndc reload"
     become: yes 
 
   - name: Set fact parent_zone_name
@@ -55,11 +59,11 @@
   - name: Add A record in parent dns
     lineinfile:
         path: /srv/docker/{{parent_dns_name}}/var/forward{{parent_zone_name}}
-        line: "{{subnet_zone_name}}	IN	A	{{container_ip}} "
+        line: "{{subnet_zone_name}}	IN	A	{{container_ip.stdout}} "
     become: true
 
   - name: Restart the named of parent dns
-    command: "docker exec -it {{parent_dns_name}} rndc reload"
+    command: "docker exec -itd {{parent_dns_name}} rndc reload"
     become: yes
 
   # If subnet dns, then also add NameServer as NS record
