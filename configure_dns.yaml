@@ -1,0 +1,30 @@
+---
+  # vars passed from parent playbook will be:
+  #   container_name: t4_dns
+  #   zone_name: "zone_name"
+
+  # Configure named.conf
+  - name: Configure named.conf
+    template:
+      src: /templates/dns_conf/named.conf.j2
+      dest: /srv/docker/{{container_name}}/etc/named.conf
+      mode: 0777
+    become: true
+
+  # Configure forward.conf
+  - name: Configure forward.conf
+    template:
+      src: /templates/dns_conf/forward.com.j2
+      dest: /srv/docker/{{container_name}}/var/forward{{zone_name}}
+      mode: 0777
+    become: true 
+    
+  # Fetch container process ID
+  - name: Fetch container process ID
+    command: "docker inspect --format {%raw%}'{{.State.Pid}}'{%endraw%} {{container_name}}"
+    register: container_pid
+
+   # Restart the named
+  - name: Restart the named
+    command: "nsenter -t {{container_pid.stdout}} -n rndc reload"
+    become: yes 

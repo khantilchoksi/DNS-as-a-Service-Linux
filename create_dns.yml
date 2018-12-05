@@ -27,7 +27,7 @@
         state: present
 
     # Create shared volum in HV
-    - name: Create shared volum in Hypervisor
+    - name: Create shared volume in Hypervisor
       file: 
           path: "/srv/docker/{{dns_containers[item].dns_name}}"
           state: directory
@@ -58,5 +58,20 @@
       vars:
         container_name: "{{dns_containers[item].dns_name}}"
         bridge_name: "{{dns_containers[item].subnet_name}}"
+      with_items: "{{ dns_containers | list }}"
+
+    # Change Resolve.conf file
+    - name: Get the ip address assigned to DNS container
+      command: "docker inspect -f {%raw%}'{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'{%endraw%} {{container_name}}"
+      become: yes
+      register: container_ip
+
+    # Configure initial setup in 
+    - name: Connect Container with bridge
+      include_tasks: configure_dns.yaml
+      vars:
+        container_name: "{{dns_containers[item].dns_name}}"
+        zone_name: "{{dns_containers[item].zone_name}}"
+        dns_server_ip: "{{container_ip.stdout}}"
       with_items: "{{ dns_containers | list }}"
     

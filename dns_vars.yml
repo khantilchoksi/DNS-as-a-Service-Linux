@@ -4,5 +4,6 @@ dns_containers:
        dns_name: t4_dns
        subnet_name: t4_dns
        publish_port: 77
-       zone_name: t4
+       zone_name: t4.com
        vpc_name: t4vpc1
+
