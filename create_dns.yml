@@ -53,8 +53,10 @@
     
     # Start named server  
     - name: Start the named
-      command: "docker exec -itd {{container_name}} /usr/sbin/named -4 -u named -c /named/etc/named.conf"
+      command: "docker exec -itd {{dns_containers[item].dns_name}} /usr/sbin/named -4 -u named -c /named/etc/named.conf"
       become: yes 
+      with_items: "{{ dns_containers | list }}"
+
       
     # Connect Container with bridge
     - name: Connect Container with bridge oir network
