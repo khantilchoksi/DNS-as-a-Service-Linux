@@ -34,6 +34,8 @@ init_config() {
     mkdir -p /named/var/data
     mkdir -p /named/var/dynamic
     mv /forward.com.default /named/var/forward.com
+    mv /forward.edu.default /named/var/forward.edu
+    mv /forward.us.default /named/var/forward.us
     chown -R named:named /named/var
   fi
 
@@ -61,7 +63,7 @@ elif [[ ${1} == '/usr/sbin/init' ]]; then
 fi
 
 if [[ -z ${1} ]]; then
-  echo "Starting init service..."
+  echo "Starting DNS service..."
   sed 's/#PermitRootLogin/PermitRootLogin/' < /etc/ssh/sshd_config > /etc/ssh/sshd_config
   exec /usr/sbin/init
   exec 'systemctl restart sshd'
