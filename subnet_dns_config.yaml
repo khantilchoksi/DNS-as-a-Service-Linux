@@ -1,7 +1,8 @@
 ---
   # vars passed from parent playbook will be:
-  #   container_name: t4_dns
-  #   zone_name: "zone_name"
+  #   container_name: t4_api_dns
+  #   zone_name: "api.t4.com"
+  #   parent_dns_name: t4_dns
 
   # Change Resolve.conf file
   - name: Get the ip address assigned to DNS container
@@ -33,3 +34,20 @@
   - name: Restart the named
     command: "docker exec -it {{container_name}} rndc reload"
     become: yes 
+
+  - name: parent subnet
+    set_fact:
+       parent_zone_name: "{{zone_name.split('.')[1]}}.{{zone_name.split('.')[2]}}"
+
+  - name: subnet dns
+    set_fact:
+       subnet_zone_name: "{{zone_name.split('.')[0]}}"
+
+  - name: add entry in parent dns
+    lineinfile:
+        path: /srv/docker/{{parent_dns_name}}/var/forward{{parent_zone_name}}
+        line: "{{subnet_zone_name}}	IN	A	{{container_ip}} "
+
+  - name: Restart the named of parent dns
+    command: "docker exec -it {{parent_dns_name}} rndc reload"
+    become: yes

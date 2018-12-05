@@ -1,9 +1,10 @@
 ---
 dns_containers:
     t4:
-       dns_name: t4_dns
-       subnet_name: t4_dns
-       publish_port: 77
-       zone_name: t4.com
+       dns_name: t4_api_dns
+       subnet_name: t4_api
+       publish_port: 78
+       zone_name: api.t4.com
        vpc_name: t4vpc1
-
+       level: subnet
+       parent_dns_name: t4_dns1

@@ -1,8 +1,8 @@
 ---
 subnets:
   t4: # Tenant name
-    subnet_name: t4_dns
+    subnet_name: t4_api
     vpc_name: t4vpc1
-    subnet_range: 17.0.0.0/24
-    vpc_gateway: 17.0.0.1/24
-    dhcp_range: 17.0.0.2,17.0.0.250,12h 
+    subnet_range: 18.0.0.0/24
+    vpc_gateway: 18.0.0.1/24
+    dhcp_range: 18.0.0.2,18.0.0.250,12h 

@@ -2,7 +2,7 @@
 - hosts: localhost
   gather_facts: no
   vars:
-    docker_image: bind_centos2
+    docker_image: bind_centos3
     docker_filepath: ./docker_images/bind_centos/
     packages:
        - docker
@@ -60,11 +60,6 @@
         bridge_name: "{{dns_containers[item].subnet_name}}"
       with_items: "{{ dns_containers | list }}"
 
-    # Change Resolve.conf file
-    - name: Get the ip address assigned to DNS container
-      command: "docker inspect -f {%raw%}'{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'{%endraw%} {{container_name}}"
-      become: yes
-      register: container_ip
 
     # Configure initial setup in 
     - name: Connect Container with bridge
@@ -72,6 +67,16 @@
       vars:
         container_name: "{{dns_containers[item].dns_name}}"
         zone_name: "{{dns_containers[item].zone_name}}"
-        dns_server_ip: "{{container_ip.stdout}}"
       with_items: "{{ dns_containers | list }}"
-    
+      when: 
+          - "{{dns_containers[item].level}}" == 'vpc'
+
+   - name: Connect Container with bridge
+      include_tasks: subnet_dns_config.yaml
+      vars:
+        container_name: "{{dns_containers[item].dns_name}}"
+        zone_name: "{{dns_containers[item].zone_name}}"
+        parent_dns_name: "{{dns_containers[item].parent_dns_name}}"
+      with_items: "{{ dns_containers | list }}"
+      when: 
+         - "{{dns_containers[item].level}}" == 'subnet'    
