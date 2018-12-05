@@ -3,7 +3,7 @@
   gather_facts: no
   vars:
     docker_image: bind_centos
-    docker_filepath: ./docker_images/hv_bind_centos/
+    docker_filepath: ../docker_images/hv_bind_centos/
     packages:
        - docker
     dns_containers:
