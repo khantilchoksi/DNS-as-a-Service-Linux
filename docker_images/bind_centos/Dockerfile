@@ -22,7 +22,7 @@ RUN rm -rf /lib/systemd/system/basic.target.wants/;
 RUN rm -rf /lib/systemd/system/anaconda.target.wants/*;
 RUN yum install -y ipvsadm
 RUN yum install -y openssh-server
-RUN yum install -y openssh-client
+RUN yum install -y openssh-clients
 
 # Enable Password less SSH
 RUN sed "s/#PermitRootLogin/PermitRootLogin/" < /etc/ssh/sshd_config > temp_config.txt
