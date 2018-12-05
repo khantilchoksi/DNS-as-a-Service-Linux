@@ -50,10 +50,14 @@
         published_ports:
           - "{{dns_containers[item].publish_port}}:{{dns_containers[item].publish_port}}/udp"
       with_items: "{{ dns_containers | list }}"
-
     
+    # Start named server  
+    - name: Start the named
+      command: "docker exec -itd {{container_name}} /usr/sbin/named -4 -u named -c /named/etc/named.conf"
+      become: yes 
+      
     # Connect Container with bridge
-    - name: Connect Container with bridge
+    - name: Connect Container with bridge oir network
       include_tasks: connect_container_bridge.yaml
       vars:
         container_name: "{{dns_containers[item].dns_name}}"
@@ -63,7 +67,7 @@
 
     # Configure initial setup in 
     - name: Configure dns normally
-      include_tasks: configure_dns.yaml
+      include_tasks: vpc_dns_config.yaml
       vars:
         container_name: "{{dns_containers[item].dns_name}}"
         zone_name: "{{dns_containers[item].zone_name}}"
@@ -79,3 +83,10 @@
         endpoint_name: "{{dns_containers[item].endpoint_name}}"
       when: dns_containers[item].level == 'subnet'
       with_items: "{{ dns_containers | list }}"
+
+    # Write to database or run this script seperately from shell
+    - name: Writing this newly created dns to DB
+      include_tasks: write_dns_vm_db.yml
+      vars:
+        dns_vms: "{{dns_containers}}"
+      become: yes

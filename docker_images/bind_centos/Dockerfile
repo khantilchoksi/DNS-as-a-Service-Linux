@@ -3,13 +3,6 @@ FROM centos:centos7
 RUN yum -y install bind-utils bind && \
     yum clean all
 
-ADD ./bind-config /
-
-# set up the BIND env and gen rndc key
-RUN rndc-confgen -a -c /etc/rndc.key && \
-    chown named:named /etc/rndc.key && \
-    chmod 755 /entrypoint
-
 # Install IP-UTILS
 #RUN yum -y update && \
 RUN yum install -y net-tools && \
@@ -17,8 +10,6 @@ RUN yum install -y net-tools && \
     yum install -y iproute && \
     yum install -y dhclient && \
     yum clean all
-
-EXPOSE 53/udp 53/tcp
 
 # For configuring OPEN-SSH
 RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in ; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done);
@@ -31,6 +22,7 @@ RUN rm -rf /lib/systemd/system/basic.target.wants/;
 RUN rm -rf /lib/systemd/system/anaconda.target.wants/*;
 RUN yum install -y ipvsadm
 RUN yum install -y openssh-server
+RUN yum install -y openssh-client
 
 # Enable Password less SSH
 RUN sed "s/#PermitRootLogin/PermitRootLogin/" < /etc/ssh/sshd_config > temp_config.txt
@@ -39,6 +31,17 @@ RUN mkdir -p /root/.ssh
 ADD ./id_rsa.pub /root/.ssh/authorized_keys
 RUN chmod 700 /root/.ssh
 RUN chmod 640 /root/.ssh/authorized_keys
+
+# BInd Configuration
+ADD ./bind-config /
+
+# set up the BIND env and gen rndc key
+RUN rndc-confgen -a -c /etc/rndc.key && \
+    chown named:named /etc/rndc.key && \
+    chmod 755 /entrypoint
+
+# Expose port for DNS server
+EXPOSE 53/udp 53/tcp
 
 # Attach filesystem volume
 # VOLUME [ "/sys/fs/cgroup"]

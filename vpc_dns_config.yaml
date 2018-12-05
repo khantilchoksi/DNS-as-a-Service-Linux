@@ -33,3 +33,23 @@
   - name: Restart the named
     command: "docker exec -it {{container_name}} rndc reload"
     become: yes 
+
+  # If subnet dns, then also add NameServer as NS record
+  - name: Set fact for vpc zone name e.g. t4.com --> t4
+    set_fact:
+       vpc_zone_name: "{{zone_name.split('.')[0]}}"
+
+  - name: Set fact for tld e.g. api.t4.com --> t4
+    set_fact:
+       tld_name: "{{zone_name.split('.')[1]}}"
+
+  - name: Add NS record in hypervisor dns
+    lineinfile:
+        path: /srv/docker/hv_dns/var/forward{{tld_name}}
+        line: "{{vpc_zone_name}}	IN	A   {{dns_server_ip}]"
+    become: true
+
+  - name: Restart the named of hypervisor dns
+    command: "docker exec -itd hv_dns rndc reload"
+    become: yes
+

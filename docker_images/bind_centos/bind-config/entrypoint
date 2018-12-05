@@ -55,7 +55,7 @@ init_config
 if [[ ${1:0:1} = '-' ]]; then
   EXTRA_ARGS="$@"
   set --
-elif [[ ${1} == '/usr/sbin/named' ]]; then
+elif [[ ${1} == '/usr/sbin/init' ]]; then
   EXTRA_ARGS="${@:2}"
   set --
 fi
