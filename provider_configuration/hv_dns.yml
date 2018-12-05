@@ -3,7 +3,7 @@
   gather_facts: no
   vars:
     docker_image: bind_centos
-    docker_filepath: ./docker_images/bind_centos/
+    docker_filepath: ./docker_images/hv_bind_centos/
     packages:
        - docker
     dns_containers:
@@ -56,4 +56,4 @@
     # Start named server  
     - name: Start the named
       command: "docker exec -itd {{container_name}} /usr/sbin/named -4 -u named -c /named/etc/named.conf"
-      become: yes
+      become: yes 
