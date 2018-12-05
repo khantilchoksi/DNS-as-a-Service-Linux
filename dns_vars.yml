@@ -7,4 +7,5 @@ dns_containers:
        zone_name: api.t4.com
        vpc_name: t4vpc1
        level: subnet
+       endpoint_name: apiserver
        parent_dns_name: t4_dns1

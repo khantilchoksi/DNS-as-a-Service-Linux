@@ -10,7 +10,7 @@
     become: yes
     register: container_ip
 
-  - name: set fact
+  - name: Set fact for dns server ip
     set_fact:
        dns_server_ip: "{{container_ip.stdout}}"
 
@@ -35,19 +35,31 @@
     command: "docker exec -it {{container_name}} rndc reload"
     become: yes 
 
-  - name: parent subnet
+  - name: Set fact parent_zone_name
     set_fact:
        parent_zone_name: "{{zone_name.split('.')[1]}}.{{zone_name.split('.')[2]}}"
 
-  - name: subnet dns
+  - name: Set fact for subnet_zone_name
     set_fact:
        subnet_zone_name: "{{zone_name.split('.')[0]}}"
 
-  - name: add entry in parent dns
+  - debug:
+      msg: "Parent Zone Name: {{parent_zone_name}} :: Subnet Zone Name: {{subnet_zone_name}}"
+
+  - name: Add NS record in parent dns
+    lineinfile:
+        path: /srv/docker/{{parent_dns_name}}/var/forward{{parent_zone_name}}
+        line: "{{endpoint_name}}.{{subnet_zone_name}}	IN	NS	{{zone_name}} "
+    become: true
+
+  - name: Add A record in parent dns
     lineinfile:
         path: /srv/docker/{{parent_dns_name}}/var/forward{{parent_zone_name}}
         line: "{{subnet_zone_name}}	IN	A	{{container_ip}} "
+    become: true
 
   - name: Restart the named of parent dns
     command: "docker exec -it {{parent_dns_name}} rndc reload"
     become: yes
+
+  # If subnet dns, then also add NameServer as NS record
