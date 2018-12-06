@@ -56,6 +56,23 @@
   - debug:
       msg: "Container IP: {{container_ip.stdout}}"
 
+  - name: Get the ip address assigned to DNS container
+    command: "docker exec -it {{container_name}} /sbin/ifconfig {{interface_prefix}}vif1 | grep 'inet' | cut -d: -f2 | awk '{print $2}'"
+    become: yes
+    register: container_subnetip
+
+  - debug:
+      msg: "Full MSG: {{container_subnetip}}"
+
+  - debug:
+      msg: "Container Subnet IP: {{container_subnetip.stdout}}"
+
+  - name: Add A record in subnet dns
+    lineinfile:
+        path: /srv/docker/{{subnet_dns}}/var/forward{{subnet_zone_name}}
+        line: "{{endpoint_name}}   IN  A  {{container_subnetip.stdout}}"
+    become: true
+
   # Change Resolve.conf file
   # - name: Change Resolve.conf file
   #   command: "nsenter -t {{container_pid.stdout}} -n echo nameserver {{container_ip.stdout}} > /etc/resolv.conf"

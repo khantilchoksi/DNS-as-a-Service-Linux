@@ -71,7 +71,7 @@
 
   - name: Key vm name
     set_fact:
-      key_item: "{{ vms[item].vm_name }}"
+      key_item: "{{ vms[item].server_name }}"
     with_items: "{{ vms | list }}"
 
   - name: Set fact if empty
