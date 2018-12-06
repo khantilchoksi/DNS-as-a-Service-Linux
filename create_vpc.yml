@@ -72,7 +72,5 @@
     # Write to database or run this script seperately from shell
     - name: Writing this newly created VPC to DB
       include_tasks: write_vpc_db.yml
-      vars:
-        vpcs: "{{vpcs}}"
       become: yes
 

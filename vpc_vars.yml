@@ -1,7 +1,7 @@
 ---
 vpcs:
-  t4:   # Tenant Name
-    vpc_name: t4vpc1
-    vpc_gateway: 92.0.0.2/24
-    provider_gateway: 92.0.0.1/24
-    provider_gateway_ip: 92.0.0.1
+  t6:   # Tenant Name
+    vpc_name: t6vpc
+    vpc_gateway: 103.0.0.2/24
+    provider_gateway: 103.0.0.1/24
+    provider_gateway_ip: 103.0.0.1
