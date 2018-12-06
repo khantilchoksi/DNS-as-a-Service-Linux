@@ -78,5 +78,26 @@ zone "." IN {
 	file "named.ca";
 };
 
+zone "com" IN {
+        type master;
+        file "forward.com";
+        allow-update { none; };
+        allow-transfer { any; };
+};
+
+zone "edu" IN {
+        type master;
+        file "forward.edu";
+        allow-update { none; };
+        allow-transfer { any; };
+};
+
+zone "us" IN {
+        type master;
+        file "forward.us";
+        allow-update { none; };
+        allow-transfer { any; };
+};
+
 include "/named/etc/named.rfc1912.zones";
 include "/named/etc/named.root.key";

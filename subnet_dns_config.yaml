@@ -1,0 +1,96 @@
+---
+  # vars passed from parent playbook will be:
+  #   container_name: t4_api_dns
+  #   zone_name: "api.t4.com"
+  #   parent_dns_name: t4_dns
+
+  # Change Resolve.conf file
+  - name: Get the ip address assigned to DNS container
+    command: "docker inspect -f {%raw%}'{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'{%endraw%} {{container_name}}"
+    become: yes
+    register: container_ip
+
+  - name: Set fact for dns server ip
+    set_fact:
+       dns_server_ip: "{{container_ip.stdout}}"
+
+  - name: Debug Subnet dns ip
+    debug:
+       msg: "Subnet DNS IP : {{container_ip.stdout}}"
+
+  # Configure named.conf
+  - name: Configure named.conf
+    template:
+      src: ./templates/dns_conf/named.conf.j2
+      dest: /srv/docker/{{container_name}}/etc/named.conf
+      mode: 0777
+    become: true
+
+  # Configure forward.conf
+  - name: Configure forward.conf
+    template:
+      src: ./templates/dns_conf/forward.com.j2
+      dest: /srv/docker/{{container_name}}/var/forward{{zone_name}}
+      mode: 0777
+    become: true 
+  
+  # Restart named server  
+  - name: Restart the named
+    command: "docker exec -itd {{container_name}} rndc reload"
+    become: yes 
+
+  - name: Set fact parent_zone_name
+    set_fact:
+       parent_zone_name: "{{zone_name.split('.')[1]}}.{{zone_name.split('.')[2]}}"
+
+  - name: Set fact for subnet_zone_name
+    set_fact:
+       subnet_zone_name: "{{zone_name.split('.')[0]}}"
+
+  - debug:
+      msg: "Parent Zone Name: {{parent_zone_name}} :: Subnet Zone Name: {{subnet_zone_name}}"
+
+  - debug:
+       msg: "{{ item }}"
+    with_items: 
+       - "{{endpoint_name}}.{{subnet_zone_name}}   IN  NS  {{zone_name}}"
+  - debug: 
+       msg: "FILE PATH: /srv/docker/{{parent_dns_name}}/var/forward{{parent_zone_name}}"
+  
+  - name: set fact of parent dns file path
+    set_fact:
+        parent_dns_file_path: "/srv/docker/{{parent_dns_name}}/var/forward{{parent_zone_name}}"
+
+    # Add records in parent dns file
+  - name: Add A record in parent dns
+    lineinfile:
+        path: "{{parent_dns_file_path}}"
+        line: "{{ item }}"
+    become: true
+    with_items:
+       -  "@    IN  NS  {{zone_name}}."
+       -  "{{endpoint_name}}.{{subnet_zone_name}}   IN  NS  {{zone_name}}."
+       -  "{{subnet_zone_name}}    IN  A   {{dns_server_ip}}"
+
+  - name: Restart the named of parent dns
+    command: "docker exec -itd {{parent_dns_name}} rndc reload"
+    become: yes
+
+  # If subnet dns, then also add NameServer as NS record
+  - name: Set fact for vpc zone e.g. api.t4.com --> t4
+    set_fact:
+       vpc_zone_name: "{{zone_name.split('.')[1]}}"
+
+  - name: Set fact for tld e.g. api.t4.com --> t4
+    set_fact:
+       tld_name: "{{zone_name.split('.')[2]}}"
+
+  - name: Add NS record in hypervisor dns
+    lineinfile:
+        path: /srv/docker/hv_dns/var/forward.{{tld_name}}
+        line: "{{subnet_zone_name}}.{{vpc_zone_name}}	IN	NS {{parent_zone_name}}."
+    become: true
+
+  - name: Restart the named of hypervisor dns
+    command: "docker exec -itd hv_dns rndc reload"
+    become: yes

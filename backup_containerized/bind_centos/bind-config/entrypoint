@@ -22,6 +22,7 @@ init_config() {
 
     mv /etc/named.* /named/etc/
     mv /named.conf.default /named/etc/named.conf
+    mv /forward.com.default /named/var/forward.com
   fi
 
   rm -rf /etc/named
@@ -33,7 +34,6 @@ init_config() {
   if [ ! -d /named/var ]; then
     mkdir -p /named/var/data
     mkdir -p /named/var/dynamic
-    mv /forward.com.default /named/var/forward.com
     chown -R named:named /named/var
   fi
 
@@ -44,7 +44,7 @@ init_config() {
 
   if [ ! -d /named/log ]; then
     mkdir /named/log
-    chmod -R 0777 /named/log
+    chmod -R 0755 /named/log
     chown -R root:named /named/log
   fi
 }
@@ -55,17 +55,18 @@ init_config
 if [[ ${1:0:1} = '-' ]]; then
   EXTRA_ARGS="$@"
   set --
-elif [[ ${1} == '/usr/sbin/init' ]]; then
+elif [[ ${1} == '/usr/sbin/named' ]]; then
   EXTRA_ARGS="${@:2}"
   set --
 fi
 
 if [[ -z ${1} ]]; then
-  echo "Starting init service..."
+  echo "Starting DNS service..."
   sed 's/#PermitRootLogin/PermitRootLogin/' < /etc/ssh/sshd_config > /etc/ssh/sshd_config
   exec /usr/sbin/init
   exec 'systemctl restart sshd'
-  # exec /usr/sbin/named -4 -u named -c /named/etc/named.conf -g ${EXTRA_ARGS}
+  exec 'echo -e "root\nroot" | passwd'
+  exec /usr/sbin/named -4 -u named -c /named/etc/named.conf -g ${EXTRA_ARGS}
   
 else
   exec "$@"

@@ -1,8 +1,8 @@
 ---
 subnets:
-  t2: # Tenant name
-    subnet_name: t2_sub3
-    vpc_name: t2vpc1
-    subnet_range: 27.0.0.0/24
-    vpc_gateway: 27.0.0.1/24
-    dhcp_range: 27.0.0.2,27.0.0.250,12h 
+  t6: # Tenant name
+    subnet_name: t6_web
+    vpc_name: t6vpc
+    subnet_range: 29.0.0.0/24
+    vpc_gateway: 29.0.0.1/24
+    dhcp_range: 29.0.0.2,29.0.0.250,12h 

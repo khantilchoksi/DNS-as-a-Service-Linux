@@ -1,8 +1,6 @@
 # Client Server Container
 FROM centos:centos7
 
-ADD ./entrypoint /entrypoint
-RUN chmod 755 /entrypoint
 # Install IP-UTILS
 RUN yum -y update && \
     yum install -y net-tools && \
@@ -21,6 +19,7 @@ RUN rm -rf /lib/systemd/system/sockets.target.wants/initctl;
 RUN rm -rf /lib/systemd/system/basic.target.wants/;
 RUN rm -rf /lib/systemd/system/anaconda.target.wants/*;
 RUN yum install -y openssh-server
+RUN yum install -y openssh-clients
 
 # Enable Password less SSH
 RUN sed "s/#PermitRootLogin/PermitRootLogin/" < /etc/ssh/sshd_config > temp_config.txt
@@ -30,6 +29,8 @@ ADD id_rsa.pub /root/.ssh/authorized_keys
 RUN chmod 700 /root/.ssh
 RUN chmod 640 /root/.ssh/authorized_keys
 
+ADD ./entrypoint /entrypoint
+RUN chmod 755 /entrypoint
 
 ENTRYPOINT [ "/entrypoint"]
 CMD [ "/usr/sbin/init" ]

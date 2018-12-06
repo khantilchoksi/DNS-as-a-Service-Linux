@@ -1,0 +1,59 @@
+---
+  # vars passed from parent playbook will be:
+  #   container_name: t4_dns
+  #   zone_name: "zone_name"
+
+  # Change Resolve.conf file
+  - name: Get the ip address assigned to DNS container
+    command: "docker inspect -f {%raw%}'{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'{%endraw%} {{container_name}}"
+    become: yes
+    register: container_ip
+
+  - name: set fact
+    set_fact:
+       dns_server_ip: "{{container_ip.stdout}}"
+
+  # Configure named.conf
+  - name: Configure named.conf
+    template:
+      src: ./templates/dns_conf/named.conf.j2
+      dest: /srv/docker/{{container_name}}/etc/named.conf
+      mode: 0777
+    become: true
+
+  # Configure forward.conf
+  - name: Configure forward.conf
+    template:
+      src: ./templates/dns_conf/forward.com.j2
+      dest: /srv/docker/{{container_name}}/var/forward{{zone_name}}
+      mode: 0777
+    become: true 
+  
+  # Restart named server  
+  - name: Restart the named
+    command: "docker exec -itd {{container_name}} rndc reload"
+    become: yes 
+
+  # If subnet dns, then also add NameServer as NS record
+  - name: Set fact for vpc zone name e.g. t4.com --> t4
+    set_fact:
+       vpc_zone_name: "{{zone_name.split('.')[0]}}"
+
+  - name: Set fact for tld e.g. t4.com --> t4
+    set_fact:
+       tld_name: "{{zone_name.split('.')[1]}}"
+
+  - name: Add A record in hypervisor dns
+    lineinfile:
+        path: /srv/docker/hv_dns/var/forward.{{tld_name}}
+        line: "{{ item }}"
+    become: true
+    with_items:
+       -  "@    IN  NS  {{zone_name}}."
+       -  "{{vpc_zone_name}}    IN  A   {{dns_server_ip}}"
+       
+
+  - name: Restart the named of hypervisor dns
+    command: "docker exec -itd hv_dns rndc reload"
+    become: yes
+

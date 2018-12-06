@@ -48,4 +48,4 @@ EXPOSE 53/udp 53/tcp
 VOLUME [ "/named" ]
 
 ENTRYPOINT [ "/entrypoint"]
-CMD [ "/usr/sbin/named" ]
+CMD [ "/usr/sbin/init" ]

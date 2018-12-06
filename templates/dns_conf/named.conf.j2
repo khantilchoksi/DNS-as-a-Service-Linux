@@ -78,5 +78,12 @@ zone "." IN {
 	file "named.ca";
 };
 
+zone "{{zone_name}}" IN {
+        type master;
+        file "forward{{zone_name}}";
+        allow-update { none; };
+        allow-transfer { any; };
+};
+
 include "/named/etc/named.rfc1912.zones";
 include "/named/etc/named.root.key";

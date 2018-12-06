@@ -1,8 +1,11 @@
 ---
 dns_containers:
-    t2:
-       dns_name: dns_t2vpc8
-       subnet_name: t2_dns1
-       publish_port: 74
-       zone_name: t2b
-       vpc_name: t2vpc1
+    t6:
+       dns_name: t6webd
+       subnet_name: t6_web
+       publish_port: 95
+       zone_name: webdns.t6.us
+       vpc_name: t6vpc
+       level: subnet
+       endpoint_name: web
+       parent_dns_name: t6dns

@@ -3,11 +3,13 @@
   gather_facts: no
   vars:
     docker_image: bind_centos
-    docker_filepath: ./docker_images/bind_centos/
+    docker_filepath: ../docker_images/hv_bind_centos/
     packages:
        - docker
-  vars_files:
-    - dns_vars.yml
+    dns_containers:
+      provider:
+        dns_name: hv_dns
+        publish_port: 79
 
   tasks:
     - debug:
@@ -56,39 +58,3 @@
       command: "docker exec -itd {{dns_containers[item].dns_name}} /usr/sbin/named -4 -u named -c /named/etc/named.conf"
       become: yes 
       with_items: "{{ dns_containers | list }}"
-
-      
-    # Connect Container with bridge
-    - name: Connect Container with bridge oir network
-      include_tasks: connect_container_bridge.yaml
-      vars:
-        container_name: "{{dns_containers[item].dns_name}}"
-        bridge_name: "{{dns_containers[item].subnet_name}}"
-      with_items: "{{ dns_containers | list }}"
-
-
-    # Configure initial setup in 
-    - name: Configure dns normally
-      include_tasks: vpc_dns_config.yaml
-      vars:
-        container_name: "{{dns_containers[item].dns_name}}"
-        zone_name: "{{dns_containers[item].zone_name}}"
-      when: dns_containers[item].level == 'vpc'
-      with_items: "{{ dns_containers | list }}"
-
-    - name: Configure dns subnet container
-      include_tasks: subnet_dns_config.yaml
-      vars:
-        container_name: "{{dns_containers[item].dns_name}}"
-        zone_name: "{{dns_containers[item].zone_name}}"
-        parent_dns_name: "{{dns_containers[item].parent_dns_name}}"
-        endpoint_name: "{{dns_containers[item].endpoint_name}}"
-      when: dns_containers[item].level == 'subnet'
-      with_items: "{{ dns_containers | list }}"
-
-    # Write to database or run this script seperately from shell
-    - name: Writing this newly created dns to DB
-      include_tasks: write_dns_vm_db.yml
-      vars:
-        dns_vms: "{{dns_containers}}"
-      become: yes
