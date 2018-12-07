@@ -40,11 +40,15 @@
     
     # Connect Container with bridge
     - name: Connect Container with bridge
-      include_tasks: connect_container_bridge.yaml
+      include_tasks: server_instance_config.yml
       vars:
         container_name: "{{servers[item].server_name}}"
         bridge_name: "{{servers[item].subnet_name}}"
+        subnet_dns: "{{servers[item].subnet_dns}}"
+        subnet_zone_name: "{{servers[item].subnet_zone_name}}"
+        endpoint_name: "{{servers[item].endpoint_name}}"
       with_items: "{{ servers | list }}"
+
 
     # Write to database or run this script seperately from shell
     - name: Writing this newly created server instance to DB

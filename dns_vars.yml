@@ -1,11 +1,11 @@
 ---
 dns_containers:
-    t4:
-       dns_name: t4_api_dns
-       subnet_name: t4_api
-       publish_port: 78
-       zone_name: api.t4.com
-       vpc_name: t4vpc1
+    t6:
+       dns_name: t6maild6
+       subnet_name: t6_mail
+       publish_port: 106
+       zone_name: maildns6.t6.us
+       vpc_name: t6vpc
        level: subnet
-       endpoint_name: apiserver
-       parent_dns_name: t4_dns1
+       endpoint_name: mail6
+       parent_dns_name: t6dns

@@ -34,10 +34,26 @@
       mode: 0777
     become: true 
   
+#  - name: Add entry inside the the subnet dns itself
+#    lineinfile:
+#        path: /srv/docker/{{container_name}}/var/forward{{zone_name}}
+#        line: "@	IN  NS		{{endpoint_name}}.{{zone_name}}."
+#    become: true
+
   # Restart named server  
   - name: Restart the named
     command: "docker exec -itd {{container_name}} rndc reload"
     become: yes 
+
+  - name: Add entry inside the the subnet dns itself
+    lineinfile:
+        path: /srv/docker/{{container_name}}/var/forward{{zone_name}}
+        line: "@   IN  NS      {{endpoint_name}}.{{zone_name}}."
+    become: true
+
+  - name: Restart the named
+    command: "docker exec -itd {{container_name}} rndc reload"
+    become: yes
 
   - name: Set fact parent_zone_name
     set_fact:
@@ -46,21 +62,24 @@
   - name: Set fact for subnet_zone_name
     set_fact:
        subnet_zone_name: "{{zone_name.split('.')[0]}}"
-
+  
   - debug:
       msg: "Parent Zone Name: {{parent_zone_name}} :: Subnet Zone Name: {{subnet_zone_name}}"
+ 
+  - name: set fact of parent dns file path
+    set_fact:
+        parent_dns_file_path: "/srv/docker/{{parent_dns_name}}/var/forward{{parent_zone_name}}"
 
-  - name: Add NS record in parent dns
-    lineinfile:
-        path: /srv/docker/{{parent_dns_name}}/var/forward{{parent_zone_name}}
-        line: "{{endpoint_name}}.{{subnet_zone_name}}	IN	NS	{{zone_name}} "
-    become: true
-
+    # Add records in parent dns file
   - name: Add A record in parent dns
     lineinfile:
-        path: /srv/docker/{{parent_dns_name}}/var/forward{{parent_zone_name}}
-        line: "{{subnet_zone_name}}	IN	A	{{container_ip.stdout}} "
+        path: "{{parent_dns_file_path}}"
+        line: "{{ item }}"
     become: true
+    with_items:
+       -  "@    IN  NS  {{zone_name}}."
+       -  "{{endpoint_name}}.{{subnet_zone_name}}   IN  NS  {{zone_name}}."
+       -  "{{subnet_zone_name}}    IN  A   {{dns_server_ip}}"
 
   - name: Restart the named of parent dns
     command: "docker exec -itd {{parent_dns_name}} rndc reload"
@@ -75,11 +94,19 @@
     set_fact:
        tld_name: "{{zone_name.split('.')[2]}}"
 
+  - name: Set fact for tld file path
+    set_fact:
+       tld_file_path: "/srv/docker/hv_dns/var/forward.{{tld_name}}"
+
   - name: Add NS record in hypervisor dns
     lineinfile:
-        path: /srv/docker/hv_dns/var/forward{{tld_name}}
-        line: "{{subnet_zone_name}}.{{vpc_zone_name}}	IN	NS {{parent_zone_name}} "
-    become: true
+        path: "{{tld_file_path}}"
+        line: "{{item}}"
+    become: true 
+    with_items:
+        - "{{subnet_zone_name}}.{{vpc_zone_name}}   IN  NS {{parent_zone_name}}."
+        - "{{endpoint_name}}.{{subnet_zone_name}}.{{vpc_zone_name}}		IN		NS		{{zone_name}}."
+        - "{{endpoint_name}}.{{vpc_zone_name}}     IN     CNAME		{{endpoint_name}}.{{zone_name}}."
 
   - name: Restart the named of hypervisor dns
     command: "docker exec -itd hv_dns rndc reload"

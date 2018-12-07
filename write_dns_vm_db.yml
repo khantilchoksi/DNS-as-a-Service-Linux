@@ -71,7 +71,7 @@
 
   - name: Key
     set_fact:
-      key_item: "{{ dns_vms[item].dns_vm_name }}"
+      key_item: "{{ dns_vms[item].dns_name }}"
     with_items: "{{ dns_vms | list }}"
 
   - name: Set fact if empty
