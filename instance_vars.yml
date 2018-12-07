@@ -1,7 +1,7 @@
 ---
 servers:
   t6: # Tenant Name
-    server_name: t6mail1
+    server_name: t6mail2
     subnet_name: t6_mail
     vpc_name: t6vpc
     os_type: centos

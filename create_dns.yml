@@ -34,6 +34,14 @@
           mode: 0777
       with_items: "{{ dns_containers | list }}"
       become: true
+
+    # Change Resolve.conf file
+    - name: Get the ip address assigned to DNS container
+      command: "docker inspect -f {%raw%}'{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'{%endraw%} {{dns_containers[item].parent_dns_name}}"
+      become: yes
+      with_items: "{{ dns_containers | list }}"
+      register: parent_dns_ip
+
       
     # Create container for dns
     - name: Create and start container for dns if already not present
@@ -45,6 +53,8 @@
         interactive: yes
         tty: yes
         detach: yes
+        dns_servers:
+            - "{{parent_dns_ip.results[0].stdout}}"
         volumes:
           - "/srv/docker/{{dns_containers[item].dns_name}}:/named"
         published_ports:
