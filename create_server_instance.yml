@@ -26,6 +26,12 @@
         state: present
       with_items: "{{ servers | list }}"
 
+    - name: Get the ip address of VPC DNS server
+      shell: "docker exec -i {{ servers[item].subnet_dns }} /sbin/ifconfig {{servers[item].subnet_dns}}vif1 | grep 'inet' | cut -d: -f2 | awk '{print $2}'"
+      become: yes
+      with_items: "{{ servers | list }}"
+      register: container_subnetip
+
     # Create container for dns
     - name: Create and start container for client server if already not present
       docker_container:
@@ -36,6 +42,8 @@
         interactive: yes
         tty: yes
         detach: yes
+        dns_servers:
+            - "{{container_subnetip.results[0].stdout}}"
       with_items: "{{ servers | list }}"
     
     # Connect Container with bridge
