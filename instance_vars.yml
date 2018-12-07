@@ -1,10 +1,10 @@
 ---
 servers:
   t6: # Tenant Name
-    server_name: t6web3
-    subnet_name: t6_web
+    server_name: t6mail1
+    subnet_name: t6_mail
     vpc_name: t6vpc
     os_type: centos
-    subnet_dns: t6webd
-    subnet_zone_name: webdns.t6.us
-    endpoint_name: web
+    subnet_dns: t6maild6
+    subnet_zone_name: maildns6.t6.us
+    endpoint_name: mail6

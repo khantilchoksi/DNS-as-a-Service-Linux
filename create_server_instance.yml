@@ -40,7 +40,7 @@
     
     # Connect Container with bridge
     - name: Connect Container with bridge
-      include_tasks: connect_container_bridge.yaml
+      include_tasks: server_instance_config.yml
       vars:
         container_name: "{{servers[item].server_name}}"
         bridge_name: "{{servers[item].subnet_name}}"

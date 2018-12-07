@@ -1,11 +1,11 @@
 ---
 dns_containers:
     t6:
-       dns_name: t6webd
-       subnet_name: t6_web
-       publish_port: 95
-       zone_name: webdns.t6.us
+       dns_name: t6maild6
+       subnet_name: t6_mail
+       publish_port: 106
+       zone_name: maildns6.t6.us
        vpc_name: t6vpc
        level: subnet
-       endpoint_name: web
+       endpoint_name: mail6
        parent_dns_name: t6dns
