@@ -2,7 +2,7 @@
 
 ### Linux Networking Project - Fall 2018  
 
-Functional Documentation of Infrastructure automation:  
+## Functional Documentation of VM based Infrastructure automation:  
 
 -------------------
 
