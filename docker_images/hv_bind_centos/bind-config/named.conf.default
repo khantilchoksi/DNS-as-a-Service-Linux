@@ -87,7 +87,7 @@ view "others" {
 
         zone "org" IN {
                 type master;
-                file "forwardus.org";
+                file "forward.org";
                 allow-update { none; };
                 allow-transfer { any; };
         };
@@ -117,7 +117,7 @@ view "US" {
 
         zone "org" IN {
                 type master;
-                file "forwardus.org";
+                file "forward.org";
                 allow-update { none; };
                 allow-transfer { any; };
         };
