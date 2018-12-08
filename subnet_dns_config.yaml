@@ -52,7 +52,7 @@
     become: true
 
   - name: Restart the named
-    command: "docker exec -itd {{container_name}} rndc reload"
+    command: "docker exec -itd {{container_name}} /usr/sbin/named -4 -u named -c /named/etc/named.conf"
     become: yes
 
   - name: Set fact parent_zone_name
@@ -82,7 +82,7 @@
        -  "{{subnet_zone_name}}    IN  A   {{dns_server_ip}}"
 
   - name: Restart the named of parent dns
-    command: "docker exec -itd {{parent_dns_name}} rndc reload"
+    command: "docker exec -itd {{parent_dns_name}} /usr/sbin/named -4 -u named -c /named/etc/named.conf"
     become: yes
 
   # If subnet dns, then also add NameServer as NS record
@@ -93,6 +93,9 @@
   - name: Set fact for tld e.g. api.t4.com --> t4
     set_fact:
        tld_name: "{{zone_name.split('.')[2]}}"
+
+  - debug:
+       msg: "tld name: {{tld_name}} and zone name: {{zone_name}}"
 
   - name: Set fact for tld file path
     set_fact:
@@ -109,5 +112,5 @@
         - "{{endpoint_name}}.{{vpc_zone_name}}     IN     CNAME		{{endpoint_name}}.{{zone_name}}."
 
   - name: Restart the named of hypervisor dns
-    command: "docker exec -itd hv_dns rndc reload"
+    command: "docker exec -itd hv_dns /usr/sbin/named -4 -u named -c /named/etc/named.conf"
     become: yes

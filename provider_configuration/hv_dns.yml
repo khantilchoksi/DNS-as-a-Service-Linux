@@ -2,7 +2,7 @@
 - hosts: localhost
   gather_facts: no
   vars:
-    docker_image: bind_centos
+    docker_image: hvbind_centos
     docker_filepath: ../docker_images/hv_bind_centos/
     packages:
        - docker
@@ -47,6 +47,8 @@
         interactive: yes
         tty: yes
         detach: yes
+        dns_servers:
+            - "127.0.0.1"    # Hypervisor DNS resolve should be own to stop recrusion
         volumes:
           - "/srv/docker/{{dns_containers[item].dns_name}}:/named"
         published_ports:

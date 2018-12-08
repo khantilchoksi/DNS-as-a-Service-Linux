@@ -42,6 +42,9 @@
       with_items: "{{ dns_containers | list }}"
       register: parent_dns_ip
 
+    - name: Debug parent dns ip
+      debug:
+          msg: "Parent DNS IP: {{parent_dns_ip.results[0].stdout}}"
       
     # Create container for dns
     - name: Create and start container for dns if already not present
