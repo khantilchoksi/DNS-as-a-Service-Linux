@@ -181,5 +181,5 @@ view  "EU" {
 
 
 
-include "/named/etc/named.rfc1912.zones";
-include "/named/etc/named.root.key";
+// include "/named/etc/named.rfc1912.zones";
+// include "/named/etc/named.root.key";
