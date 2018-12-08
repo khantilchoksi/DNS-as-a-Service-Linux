@@ -76,6 +76,10 @@
         line: "{{endpoint_name}}   IN  A  {{container_subnetip.stdout}}"
     become: true
 
+  - name: Restart the named of subnet dns
+    command: "docker exec -itd {{subnet_dns}} /usr/sbin/named -4 -u named -c /named/etc/named.conf"
+    become: yes
+
   - name: Remove default route
     shell: "docker exec -i {{ container_name }} ip route del default"
     become: yes
