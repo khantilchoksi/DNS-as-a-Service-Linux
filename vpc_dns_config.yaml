@@ -31,7 +31,7 @@
   
   # Restart named server  
   - name: Restart the named
-    command: "docker exec -itd {{container_name}} rndc reload"
+    command: "docker exec -itd {{container_name}} /usr/sbin/named -4 -u named -c /named/etc/named.conf"
     become: yes 
 
   # If subnet dns, then also add NameServer as NS record
@@ -54,6 +54,6 @@
        
 
   - name: Restart the named of hypervisor dns
-    command: "docker exec -itd hv_dns rndc reload"
+    command: "docker exec -itd hv_dns /usr/sbin/named -4 -u named -c /named/etc/named.conf"
     become: yes
 

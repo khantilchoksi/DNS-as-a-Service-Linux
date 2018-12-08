@@ -1,7 +1,10 @@
 ---
 servers:
-  t2: # Tenant Name
-    server_name: t2vm6
-    subnet_name: t2_sub3
-    vpc_name: t2vpc1
+  t7: # Tenant Name
+    server_name: t7test2
+    subnet_name: t7_test
+    vpc_name: t7vpc
     os_type: centos
+    subnet_dns: t7testd
+    subnet_zone_name: testdns.t7.edu
+    endpoint_name: test

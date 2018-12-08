@@ -78,26 +78,108 @@ zone "." IN {
 	file "named.ca";
 };
 
-zone "com" IN {
-        type master;
-        file "forward.com";
-        allow-update { none; };
-        allow-transfer { any; };
+acl US {        172.16.0.0/12; };
+acl EU {        192.168.154.0/24; };
+acl others {    0.0.0.0/0; };
+
+view "others" {
+        match-clients { others; };
+
+        zone "org" IN {
+                type master;
+                file "forward.org";
+                allow-update { none; };
+                allow-transfer { any; };
+        };
+
+        zone "edu" IN {
+                type master;
+                file "forward.edu";
+                allow-update { none; };
+                allow-transfer { any; };
+        };
+
+        zone "com" IN {
+                type master;
+                file "forward.com";
+                allow-update { none; };
+                allow-transfer { any; };
+        };
+
+        zone "." IN {
+                type hint;
+                file "named.ca";
+        };
 };
 
-zone "edu" IN {
-        type master;
-        file "forward.edu";
-        allow-update { none; };
-        allow-transfer { any; };
+view "US" {
+        match-clients { US; };
+
+        zone "org" IN {
+                type master;
+                file "forward.org";
+                allow-update { none; };
+                allow-transfer { any; };
+        };
+
+        zone "edu" IN {
+                type master;
+                file "forward.edu";
+                allow-update { none; };
+                allow-transfer { any; };
+        };
+
+        zone "com" IN {
+                type master;
+                file "forward.com";
+                allow-update { none; };
+                allow-transfer { any; };
+        };
+
+        zone "us" IN {
+                type master;
+                file "forward.us";
+                allow-update { none; };
+                allow-transfer { any; };
+        };
+
+        zone "." IN {
+                type hint;
+                file "named.ca";
+        };
 };
 
-zone "us" IN {
-        type master;
-        file "forward.us";
-        allow-update { none; };
-        allow-transfer { any; };
+view  "EU" {
+        match-clients { EU; };
+
+        zone "org" IN {
+                type master;
+                file "forward.org";
+                allow-update { none; };
+                allow-transfer { any; };
+        };
+
+        zone "edu" IN {
+                type master;
+                file "forward.edu";
+                allow-update { none; };
+                allow-transfer { any; };
+        };
+
+        zone "com" IN {
+                type master;
+                file "forward.com";
+                allow-update { none; };
+                allow-transfer { any; };
+        };
+
+        zone "." IN {
+                type hint;
+                file "named.ca";
+        };
 };
 
-include "/named/etc/named.rfc1912.zones";
-include "/named/etc/named.root.key";
+
+
+// include "/named/etc/named.rfc1912.zones";
+// include "/named/etc/named.root.key";

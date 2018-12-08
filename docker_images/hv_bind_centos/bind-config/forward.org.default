@@ -1,0 +1,8 @@
+$TTL 86400
+@   IN  SOA    org. root.org. (
+        2011071001  ;Serial
+        10        ;Refresh
+        5        ;Retry
+        10      ;Expire
+        20       ;Minimum TTL
+)
