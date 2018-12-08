@@ -58,7 +58,7 @@ The ansible script create_dns.yaml file will take care of the logic, automation 
 ------------------------------
 ### Containerized Server Instance CRUD:
 - **Create:**   
-    - Tenant / User will require to fill up a form or json / yaml file which has creation parameters like: vcpu, memory, disk size, OS type, VPC id and as result we will create VM for the user, assign IP, (and do we have to provide private key to user ?)  
+    - Tenant / User will require to fill up a form or json / yaml file which has creation parameters like: vcpu, memory, disk size, OS type, VPC id and as result we will create VM for the user, assign IP.
     - *Commands:*   
         ```
         sudo ansible-playbook create_server_instance.yaml
