@@ -140,6 +140,6 @@ elif del_type == 2:
 	del_subnet(subnet_todel, t_id)
 elif del_type == 3:
 	container_todel = raw_input("Enter the instance name")
-	del_container(container_name, t_id)
-	del_dns_container(container_name, t_id)
+	del_container(container_todel, t_id)
+	del_dns_container(container_todel, t_id)
 
