@@ -8,3 +8,4 @@ servers:
     subnet_dns: t7testd
     subnet_zone_name: testdns.t7.edu
     endpoint_name: test
+    vpc_dns: t7dns

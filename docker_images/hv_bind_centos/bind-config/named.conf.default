@@ -15,9 +15,9 @@ options {
 	statistics-file "/named/var/data/named_stats.txt";
 	memstatistics-file "/named/var/data/named_mem_stats.txt";
 
-  allow-query     { 127.0.0.1; 172.16.0.0/12; };
-  allow-query-cache { 127.0.0.1; 172.16.0.0/12; };
-  allow-query-cache-on { 127.0.0.1; 172.16.0.0/12; };
+  allow-query     { 127.0.0.1; 172.16.0.0/12; any;};
+  allow-query-cache { 127.0.0.1; 172.16.0.0/12; any;};
+  allow-query-cache-on { 127.0.0.1; 172.16.0.0/12; any;};
 
 	/*
 	 - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
@@ -71,11 +71,6 @@ logging {
         };
 
         category unmatched { log_unmatched; };
-};
-
-zone "." IN {
-	type hint;
-	file "named.ca";
 };
 
 acl US {        172.16.0.0/12; };

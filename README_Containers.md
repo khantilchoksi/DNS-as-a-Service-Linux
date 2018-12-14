@@ -58,7 +58,7 @@ The ansible script create_dns.yaml file will take care of the logic, automation 
 ------------------------------
 ### Containerized Server Instance CRUD:
 - **Create:**   
-    - Tenant / User will require to fill up a form or json / yaml file which has creation parameters like: vcpu, memory, disk size, OS type, VPC id and as result we will create VM for the user, assign IP, (and do we have to provide private key to user ?)  
+    - Tenant / User will require to fill up a form or json / yaml file which has creation parameters like: vcpu, memory, disk size, OS type, VPC id and as result we will create VM for the user, assign IP.
     - *Commands:*   
         ```
         sudo ansible-playbook create_server_instance.yaml
@@ -66,7 +66,7 @@ The ansible script create_dns.yaml file will take care of the logic, automation 
     -   Requirements: `instance_vars.yaml` file with tenant id and required parameters.
     - Automation:
         - Completely automated server containers instance spin up, attach with subnet and will also get ip address from dhcp server from subnet as well as controller network.
-        - It will also define 
+        - It will also define and update nameserver in the container.
         - Provider adming able to ssh to this new vm without any ssh keypair generation manual steps.
 
 
@@ -122,7 +122,14 @@ It is assumed that client will perform following steps in order to build their i
 ### Notes:  
 - All the ansible scripts / tasks written are idempotent meaning if a client runs the same parameters, our end system won't be affected. 
 - All the duplication checks are done in the playbook and accordingly tasks are run.    
-- We are storing database as file and each tenant has different folder inside `tenants` directory.
+- We are storing database as file and each tenant has different folder inside [`tenants`](./tenants) directory. (Also attached sample tenants database with code.)  
+
+
+-----------------------------------------------------------------
+## VM architecture:
+
+- Documentation: ./README_Containers.md  
+- Codes inside [this](./vm_automation) folder for VM. 
 -------------------
 ### References: 
 - Bind CentOS Docker Image: https://github.com/CentOS/CentOS-Dockerfiles/tree/master/bind/centos7 

@@ -27,7 +27,7 @@
       with_items: "{{ servers | list }}"
 
     - name: Get the ip address of VPC DNS server
-      shell: "docker exec -i {{ servers[item].subnet_dns }} /sbin/ifconfig {{servers[item].subnet_dns}}vif1 | grep 'inet' | cut -d: -f2 | awk '{print $2}'"
+      shell: "docker exec -i {{ servers[item].vpc_dns }} /sbin/ifconfig {{servers[item].vpc_dns}}vif1 | grep 'inet' | cut -d: -f2 | awk '{print $2}'"
       become: yes
       with_items: "{{ servers | list }}"
       register: container_subnetip
